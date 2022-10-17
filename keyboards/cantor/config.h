@@ -24,10 +24,11 @@
 
 /* Top left key on left half */
 #define BOOTMAGIC_LITE_ROW    0
-#define BOOTMAGIC_LITE_COLUMN 0
+#define BOOTMAGIC_LITE_COLUMN 1
 /* Top right key on right half */
 #define BOOTMAGIC_LITE_ROW_RIGHT    4
-#define BOOTMAGIC_LITE_COLUMN_RIGHT 5
+#define BOOTMAGIC_LITE_COLUMN_RIGHT 4
+
 
 /*
  * Feature disable options
@@ -44,3 +45,11 @@
 //#define NO_ACTION_LAYER
 //#define NO_ACTION_TAPPING
 //#define NO_ACTION_ONESHOT
+
+
+#define MASTER_RIGHT
+#define IGNORE_MOD_TAP_INTERRUPT
+#define PS2_CLOCK_PIN A9
+#define PS2_DATA_PIN  B2
+#define PS2_MOUSE_ROTATE 270
+

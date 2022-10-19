@@ -33,6 +33,7 @@
 
 
 #define MASTER_RIGHT
+#define PERMISSIVE_HOLD
 #define IGNORE_MOD_TAP_INTERRUPT
 #define PS2_CLOCK_PIN A9
 #define PS2_DATA_PIN  B2

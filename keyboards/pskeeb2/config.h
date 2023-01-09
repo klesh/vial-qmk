@@ -51,7 +51,7 @@
 /* trackpoint */
 #define PS2_CLOCK_PIN A7
 #define PS2_DATA_PIN  A6
-#define PS2_MOUSE_ROTATE 270
+#define PS2_MOUSE_ROTATE 90
 
 
 // /* joystick */

@@ -12,9 +12,9 @@
 #define MASTER_RIGHT
 
 #define DIRECT_PINS {{B12, B15, B10, B1, B0}, \
-                     {B13, A8, B8, A4, A3}, \
-                     {B14, A15, B9, A1, A2}, \
-                     {B3, B4, B5, A0, NO_PIN}}
+                     {B13, A8, B8, A7, A6}, \
+                     {B14, A15, B9, A4, A5}, \
+                     {B3, B4, B5, A2, NO_PIN}}
 
 #define SERIAL_USART_FULL_DUPLEX   // Enable full duplex operation mode.
 #define SERIAL_USART_TX_PIN B6     // USART TX pin
@@ -49,8 +49,8 @@
 
 
 /* trackpoint */
-#define PS2_CLOCK_PIN A7
-#define PS2_DATA_PIN  A6
+#define PS2_CLOCK_PIN C14
+#define PS2_DATA_PIN  C15
 #define PS2_MOUSE_ROTATE 90
 
 
@@ -63,8 +63,8 @@
 
 
 /* encoder */
-#define ENCODERS_PAD_A {C14}
-#define ENCODERS_PAD_B {C15}
+#define ENCODERS_PAD_A {A0}
+#define ENCODERS_PAD_B {A1}
 #define ENCODER_RESOLUTION 2
 #define ENCODERS_A_REVERSE
 #define ENCODERS_B_REVERSE

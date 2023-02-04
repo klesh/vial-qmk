@@ -1,6 +1,6 @@
 {
     "manufacturer": "Klesh Wong",
-    "keyboard_name": "pskeeb2",
+    "keyboard_name": "pskeeb2.2",
     "maintainer": "klesh",
     "bootloader": "stm32-dfu",
     "features": {
@@ -9,14 +9,14 @@
         "console": false,
         "extrakey": true,
         "mousekey": true,
-        "nkro": true
+        "nkro": false
     },
     "processor": "STM32F401",
     "board": "BLACKPILL_STM32_F401",
-    "url": "https://github.com/klesh/pskeeb",
+    "url": "https://github.com/klesh/pskeeb2",
     "usb": {
-        "device_version": "1.0.0",
-        "pid": "0x8116",
+        "device_version": "2.2.0",
+        "pid": "0x8117",
         "vid": "0xFEED"
     },
     "layouts": {

@@ -54,3 +54,8 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
     [_SHORTCUT] = { ENCODER_CCW_CW(RGB_RMOD, RGB_MOD),    ENCODER_CCW_CW(KC_MS_WH_UP, KC_MS_WH_DOWN) },
 };
 #endif
+
+// Workaround for https://github.com/qmk/qmk_firmware/issues/16406
+void suspend_wakeup_init_user(void) {
+    NVIC_SystemReset();
+}

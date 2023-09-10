@@ -65,6 +65,6 @@
 /* encoder */
 #define ENCODERS_PAD_A {A0}
 #define ENCODERS_PAD_B {A1}
-#define ENCODER_RESOLUTION 2
+#define ENCODER_RESOLUTION 4
 #define ENCODERS_A_REVERSE
 #define ENCODERS_B_REVERSE

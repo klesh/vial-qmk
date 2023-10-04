@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "config_common.h"
 
 /* key matrix size */
 #define MATRIX_ROWS 8
@@ -44,15 +43,11 @@
 //#define NO_ACTION_ONESHOT
 
 
-/* important for home-row-modifiers */
-#define IGNORE_MOD_TAP_INTERRUPT
-
-
 /* trackpoint */
 #define PS2_CLOCK_PIN C14
 #define PS2_DATA_PIN  C15
 #define PS2_MOUSE_ROTATE 90
-
+#define PS2_DRIVER interrupt
 
 // /* joystick */
 // #define ANALOG_JOYSTICK_X_AXIS_PIN A0

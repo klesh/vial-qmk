@@ -18,6 +18,16 @@
             ["GP15", "GP14", "GP16", "GP17", null]
         ]
     },
+    "rgb_matrix": {
+        "layout": [
+            {"x": 19, "y": 77, "flags": 2},
+            {"x": 76, "y": 62, "flags": 2},
+            {"x": 105, "y": 66, "flags": 2},
+            {"x": 114, "y": 17, "flags": 2},
+            {"x": 66, "y": 6, "flags": 2},
+            {"x": 17, "y": 17, "flags": 2}
+        ]
+    },
     "layouts": {
         "LAYOUT_split_3x5_4": {
             "layout": [

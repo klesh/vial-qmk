@@ -1,5 +1,6 @@
 SPLIT_KEYBOARD = yes
 SERIAL_DRIVER = usart
-ENCODER_ENABLE = yes
+
 PS2_MOUSE_ENABLE = yes
 PS2_DRIVER = interrupt
+

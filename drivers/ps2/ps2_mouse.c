@@ -81,13 +81,8 @@ void ps2_mouse_task(void) {
     rcv = ps2_host_send(PS2_MOUSE_READ_DATA);
     if (rcv == PS2_ACK) {
         mouse_report.buttons = ps2_host_recv_response();
-<<<<<<< HEAD
-        mouse_report.x       = ps2_host_recv_response();
-        mouse_report.y       = ps2_host_recv_response();
-=======
         mouse_report.x       = ps2_host_recv_response() * PS2_MOUSE_X_MULTIPLIER;
         mouse_report.y       = ps2_host_recv_response() * PS2_MOUSE_Y_MULTIPLIER;
->>>>>>> fb89d961bd (fix: trackpoint works with mousekeys)
 #    ifdef PS2_MOUSE_ENABLE_SCROLLING
         mouse_report.v = -(ps2_host_recv_response() & PS2_MOUSE_SCROLL_MASK);
 #    endif

@@ -1,55 +1,23 @@
 {
     "manufacturer": "Klesh Wong",
-    "keyboard_name": "pskeeb2 cherry hotswap",
+    "keyboard_name": "pskeeb1 gateron ks27",
     "maintainer": "klesh",
-    "bootloader": "rp2040",
-    "processor": "RP2040",
-    "url": "https://github.com/klesh/pskeeb2",
-    "usb": {
-        "device_version": "2.8.0",
-        "pid": "0x8118",
-        "vid": "0xFEED"
-    },
+    "bootloader": "stm32-dfu",
     "features": {
         "bootmagic": true,
-        "command": true,
-        "console": true,
+        "command": false,
+        "console": false,
         "extrakey": true,
         "mousekey": true,
-        "nkro": true,
-        "rgb_matrix": true
+        "nkro": true
     },
-    "diode_direction": "COL2ROW",
-    "matrix_pins": {
-        "direct": [
-            ["GP4", "GP3", "GP2", "GP1", "GP0"],
-            ["GP7", "GP27", "GP6", "GP28", "GP5"],
-            ["GP21", "GP22", "GP9", "GP8", "GP26"],
-            ["GP15", "GP14", "GP16", "GP17", null]
-        ]
-    },
-    "rgb_matrix": {
-        "driver": "ws2812",
-        "split_count": [6, 6],
-        "layout": [
-            {"x": 99, "y": 84, "flags": 2},
-            {"x": 42, "y": 69, "flags": 2},
-            {"x": 14, "y": 73, "flags": 2},
-            {"x": 5, "y": 23, "flags": 2},
-            {"x": 52, "y": 13, "flags": 2},
-            {"x": 100, "y": 24, "flags": 2},
-
-            {"x": 114, "y": 84, "flags": 2},
-            {"x": 171, "y": 69, "flags": 2},
-            {"x": 199, "y": 73, "flags": 2},
-            {"x": 208, "y": 23, "flags": 2},
-            {"x": 161, "y": 13, "flags": 2},
-            {"x": 112, "y": 24, "flags": 2}
-        ]
-    },
-    "ws2812": {
-        "pin": "GP18",
-        "driver": "vendor"
+    "processor": "STM32F401",
+    "board": "BLACKPILL_STM32_F401",
+    "url": "https://github.com/klesh/pskeeb",
+    "usb": {
+        "device_version": "1.0.0",
+        "pid": "0x8115",
+        "vid": "0xFEED"
     },
     "layouts": {
         "LAYOUT_split_3x5_4": {

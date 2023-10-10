@@ -1,8 +1,8 @@
 {
-    "name": "pskeeb2 express",
+    "name": "pskeeb express",
     "lighting": "none",
     "vendorId": "0xFEED",
-    "productId": "0x8117",
+    "productId": "0x8116",
     "matrix": {
         "rows": 8,
         "cols": 5

@@ -1,15 +1,12 @@
 {
-    "name": "pskeeb2 cherry hotswap",
-    "lighting": "vialrgb",
+    "name": "pskeeb1 gateron ks27",
+    "lighting": "none",
     "vendorId": "0xFEED",
-    "productId": "0x8118",
+    "productId": "0x8115",
     "matrix": {
         "rows": 8,
         "cols": 5
     },
-    "menus": [
-        "qmk_rgb_matrix"
-    ],
     "layouts": {
         "keymap": [
             [

@@ -10,6 +10,16 @@
         "pid": "0x8118",
         "vid": "0xFEED"
     },
+    "features": {
+        "bootmagic": true,
+        "command": true,
+        "console": true,
+        "extrakey": true,
+        "mousekey": true,
+        "nkro": true,
+        "rgb_matrix": true
+    },
+    "diode_direction": "COL2ROW",
     "matrix_pins": {
         "direct": [
             ["GP4", "GP3", "GP2", "GP1", "GP0"],
@@ -19,14 +29,27 @@
         ]
     },
     "rgb_matrix": {
+        "driver": "ws2812",
+        "split_count": [6, 6],
         "layout": [
-            {"x": 19, "y": 77, "flags": 2},
-            {"x": 76, "y": 62, "flags": 2},
-            {"x": 105, "y": 66, "flags": 2},
-            {"x": 114, "y": 17, "flags": 2},
-            {"x": 66, "y": 6, "flags": 2},
-            {"x": 17, "y": 17, "flags": 2}
+            {"x": 99, "y": 84, "flags": 2},
+            {"x": 42, "y": 69, "flags": 2},
+            {"x": 14, "y": 73, "flags": 2},
+            {"x": 5, "y": 23, "flags": 2},
+            {"x": 52, "y": 13, "flags": 2},
+            {"x": 100, "y": 24, "flags": 2},
+
+            {"x": 114, "y": 84, "flags": 2},
+            {"x": 171, "y": 69, "flags": 2},
+            {"x": 199, "y": 73, "flags": 2},
+            {"x": 208, "y": 23, "flags": 2},
+            {"x": 161, "y": 13, "flags": 2},
+            {"x": 112, "y": 24, "flags": 2}
         ]
+    },
+    "ws2812": {
+        "pin": "GP18",
+        "driver": "vendor"
     },
     "layouts": {
         "LAYOUT_split_3x5_4": {

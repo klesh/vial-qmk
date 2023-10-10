@@ -55,42 +55,46 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
 };
 #endif
 
-#ifdef OLED_ENABLE
-oled_rotation_t oled_init_kb(oled_rotation_t rotation) {
-    if (!is_keyboard_master()) {
-        return OLED_ROTATION_180;  // flips the display 180 degrees if offhand
-    }
 
-    return rotation;
-}
+
+
+#ifdef OLED_ENABLE
+
+
+// oled_rotation_t oled_init_kb(oled_rotation_t rotation) {
+//     if (!is_keyboard_master()) {
+//         return OLED_ROTATION_180;  // flips the display 180 degrees if offhand
+//     }
+
+//     return rotation;
+// }
+
 bool oled_task_user(void) {
     // Host Keyboard Layer Status
     oled_write_P(PSTR("Layer: "), false);
-
-    switch (get_highest_layer(layer_state)) {
-        case _QWERTY:
-            oled_write_P(PSTR("Default\n"), false);
-            break;
-        case _LOWER:
-            oled_write_P(PSTR("FN_NUM\n"), false);
-            break;
-        case _RAISE:
-            oled_write_P(PSTR("SYMBOL\n"), false);
-            break;
-        case _SHORTCUT:
-            oled_write_P(PSTR("SHORTCUT\n"), false);
-            break;
-        default:
-            // Or use the write_ln shortcut over adding '\n' to the end of your string
-            oled_write_ln_P(PSTR("Undefined"), false);
-    }
+    char layer[3];
+    itoa(get_highest_layer(layer_state), layer, 10);
+    oled_write_P(layer, false);
 
     // Host Keyboard LED Status
     led_t led_state = host_keyboard_led_state();
-    oled_write_P(led_state.num_lock ? PSTR("NUM ") : PSTR("    "), false);
-    oled_write_P(led_state.caps_lock ? PSTR("CAP ") : PSTR("    "), false);
-    oled_write_P(led_state.scroll_lock ? PSTR("SCR ") : PSTR("    "), false);
+    oled_write_P(led_state.num_lock ? PSTR(" NUM ") : PSTR("    "), false);
+    oled_write_P(led_state.caps_lock ? PSTR(" CAP ") : PSTR("    "), false);
+    oled_write_P(led_state.scroll_lock ? PSTR(" SCR ") : PSTR("    "), false);
     
+    // new line
+    oled_set_cursor(0, 1);
+
+    // rgb state
+    if (rgb_matrix_is_enabled()) {
+      char rgb_info_str[28];
+      snprintf(
+        rgb_info_str, sizeof(rgb_info_str), "RGB: m%2d h%3d s%3d v%3d",
+        rgb_matrix_get_mode(), rgb_matrix_get_hue(), rgb_matrix_get_sat(), rgb_matrix_get_val()
+      );
+      oled_write_P(rgb_info_str, false);
+    }
+
     return false;
 }
 #endif

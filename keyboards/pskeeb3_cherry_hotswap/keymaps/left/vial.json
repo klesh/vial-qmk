@@ -1,12 +1,15 @@
 {
-    "name": "pskeeb",
-    "lighting": "none",
+    "name": "pskeeb3 cherry hotswap",
+    "lighting": "vialrgb",
     "vendorId": "0xFEED",
-    "productId": "0x8115",
+    "productId": "0x8117",
     "matrix": {
         "rows": 8,
         "cols": 5
     },
+    "menus": [
+        "qmk_rgb_matrix"
+    ],
     "layouts": {
         "keymap": [
             [

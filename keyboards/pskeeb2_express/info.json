@@ -13,10 +13,9 @@
     },
     "processor": "STM32F401",
     "board": "BLACKPILL_STM32_F401",
-    "url": "https://github.com/klesh/pskeeb2",
+    "url": "https://github.com/klesh/pskeeb",
     "usb": {
-        "device_version": "2.2.0",
-        "pid": "0x8117",
+        "pid": "0x8116",
         "vid": "0xFEED"
     },
     "layouts": {

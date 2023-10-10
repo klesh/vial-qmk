@@ -1,6 +1,6 @@
 {
     "manufacturer": "Klesh Wong",
-    "keyboard_name": "pskeeb",
+    "keyboard_name": "pskeeb1 gateron ks27",
     "maintainer": "klesh",
     "bootloader": "stm32-dfu",
     "features": {

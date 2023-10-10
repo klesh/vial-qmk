@@ -1,4 +1,6 @@
-# pskeeb2 cherry hotswap
+# pskeeb2 express
+
+![pskeeb2](to be uploaded)
 
 The Portable Split Keeb is a 36 key diodeless split keyboard, designed with simplicity and portability in mind, aiming to provide a more ergonomic (stronger column stagger) corne-like layout with a simple, yet powerful, easy to assemble and cheap design.. It is inspired by the following projects:
 
@@ -13,11 +15,11 @@ The Portable Split Keeb is a 36 key diodeless split keyboard, designed with simp
 
 Make example for this keyboard (after setting up your build environment):
 
-    make pskeeb2:default
+    make pskeeb2_express:vial
 
 Flashing example for this keyboard:
 
-    make pskeeb2:default:flash
+    make pskeeb2_express:vial:flash
 
 See the [build environment setup](https://docs.qmk.fm/#/getting_started_build_tools) and the [make instructions](https://docs.qmk.fm/#/getting_started_make_guide) for more information. Brand new to QMK? Start with our [Complete Newbs Guide](https://docs.qmk.fm/#/newbs).
 

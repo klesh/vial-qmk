@@ -2,7 +2,7 @@
     "name": "pskeeb1 gateron ks27",
     "lighting": "none",
     "vendorId": "0xFEED",
-    "productId": "0x8115",
+    "productId": "0x8102",
     "matrix": {
         "rows": 8,
         "cols": 5

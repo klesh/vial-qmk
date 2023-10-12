@@ -16,7 +16,7 @@
     "url": "https://github.com/klesh/pskeeb",
     "usb": {
         "device_version": "1.0.0",
-        "pid": "0x8115",
+        "pid": "0x8102",
         "vid": "0xFEED"
     },
     "layouts": {

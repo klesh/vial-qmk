@@ -25,6 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "report.h"
 #include "debug.h"
 #include "ps2.h"
+#include "action_layer.h"
 
 /* ============================= MACROS ============================ */
 
@@ -35,6 +36,7 @@ static inline void ps2_mouse_convert_report_to_hid(report_mouse_t *mouse_report)
 static inline void ps2_mouse_clear_report(report_mouse_t *mouse_report);
 static inline void ps2_mouse_enable_scrolling(void);
 static inline void ps2_mouse_scroll_button_task(report_mouse_t *mouse_report);
+static inline void ps2_mouse_scroll_layer_task(report_mouse_t *mouse_report);
 
 /* ============================= IMPLEMENTATION ============================ */
 
@@ -113,6 +115,9 @@ void ps2_mouse_task(void) {
         ps2_mouse_convert_report_to_hid(&mouse_report);
 #if PS2_MOUSE_SCROLL_BTN_MASK
         ps2_mouse_scroll_button_task(&mouse_report);
+#endif
+#if PS2_MOUSE_SCROLL_LAYER_MASK
+        ps2_mouse_scroll_layer_task(&mouse_report);
 #endif
         if (mouse_report.x || mouse_report.y || mouse_report.v) {
             ps2_mouse_moved_user(&mouse_report);
@@ -300,8 +305,25 @@ static inline void ps2_mouse_scroll_button_task(report_mouse_t *mouse_report) {
         }
 #endif
         scroll_state = SCROLL_NONE;
+    } else if (scroll_state == SCROLL_NONE) {
+        // Some of the scroll buttons are pressed or released
+        return;
     }
 
     RELEASE_SCROLL_BUTTONS;
 }
 
+static inline void ps2_mouse_scroll_layer_task(report_mouse_t *mouse_report) {
+    if ((1 << get_highest_layer(layer_state)) & PS2_MOUSE_SCROLL_LAYER_MASK) {
+        mouse_report->v = -mouse_report->y / (PS2_MOUSE_SCROLL_DIVISOR_V);
+        mouse_report->h = mouse_report->x / (PS2_MOUSE_SCROLL_DIVISOR_H);
+        mouse_report->x = 0;
+        mouse_report->y = 0;
+#ifdef PS2_MOUSE_INVERT_H
+        mouse_report->h = -mouse_report->h;
+#endif
+#ifdef PS2_MOUSE_INVERT_V
+        mouse_report->v = -mouse_report->v;
+#endif
+    }
+}

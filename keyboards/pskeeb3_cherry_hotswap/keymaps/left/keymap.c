@@ -78,9 +78,9 @@ bool oled_task_user(void) {
 
     // Host Keyboard LED Status
     led_t led_state = host_keyboard_led_state();
-    oled_write_P(led_state.num_lock ? PSTR(" NUM ") : PSTR("    "), false);
-    oled_write_P(led_state.caps_lock ? PSTR(" CAP ") : PSTR("    "), false);
-    oled_write_P(led_state.scroll_lock ? PSTR(" SCR ") : PSTR("    "), false);
+    oled_write_P(led_state.num_lock ? PSTR(" NUM") : PSTR("    "), false);
+    oled_write_P(led_state.caps_lock ? PSTR(" CAP") : PSTR("    "), false);
+    oled_write_P(led_state.scroll_lock ? PSTR(" SCR") : PSTR("    "), false);
     
     // new line
     oled_set_cursor(0, 1);
@@ -89,10 +89,12 @@ bool oled_task_user(void) {
     if (rgb_matrix_is_enabled()) {
       char rgb_info_str[28];
       snprintf(
-        rgb_info_str, sizeof(rgb_info_str), "RGB: m%2d h%3d s%3d v%3d",
-        rgb_matrix_get_mode(), rgb_matrix_get_hue(), rgb_matrix_get_sat(), rgb_matrix_get_val()
+        rgb_info_str, sizeof(rgb_info_str), "RGB: m%2d s%3d b%3d",
+        rgb_matrix_get_mode(), rgb_matrix_get_speed(), rgb_matrix_get_val()
       );
       oled_write_P(rgb_info_str, false);
+    } else {
+      oled_write_P(PSTR("                    "), false);
     }
 
     return false;

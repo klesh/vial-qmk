@@ -19,6 +19,9 @@
         "nkro": true,
         "rgb_matrix": true
     },
+    "tapping": {
+        "permissive_hold": true
+    },
     "diode_direction": "COL2ROW",
     "matrix_pins": {
         "direct": [

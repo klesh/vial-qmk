@@ -314,6 +314,7 @@ static inline void ps2_mouse_scroll_button_task(report_mouse_t *mouse_report) {
 }
 
 static inline void ps2_mouse_scroll_layer_task(report_mouse_t *mouse_report) {
+#if PS2_MOUSE_SCROLL_LAYER_MASK
     if ((1 << get_highest_layer(layer_state)) & PS2_MOUSE_SCROLL_LAYER_MASK) {
         mouse_report->v = -mouse_report->y / (PS2_MOUSE_SCROLL_DIVISOR_V);
         mouse_report->h = mouse_report->x / (PS2_MOUSE_SCROLL_DIVISOR_H);
@@ -326,4 +327,5 @@ static inline void ps2_mouse_scroll_layer_task(report_mouse_t *mouse_report) {
         mouse_report->v = -mouse_report->v;
 #endif
     }
+#endif
 }

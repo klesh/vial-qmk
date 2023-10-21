@@ -16,7 +16,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   KC_Q,         KC_W,         KC_E,         KC_R,         KC_T,              KC_Y,    KC_U,         KC_I,         KC_O,         KC_P,
   LALT_T(KC_A), LSFT_T(KC_S), LGUI_T(KC_D), LCTL_T(KC_F), LT(_SC, KC_G),     LT(_SC, KC_H),    RCTL_T(KC_J), RGUI_T(KC_K), RSFT_T(KC_L), RALT_T(KC_SCLN),
   LCTL_T(KC_Z), KC_X,         KC_C,         KC_V,         KC_B,              KC_N,    KC_M,         KC_COMM,      KC_DOT,       LCTL_T(KC_SLSH),
-                  TO(_QW), LT(_LO, KC_ENT), LT(_SC, KC_ESC), KC_BTN2,      KC_BTN1, LT(_RA, KC_BSPC), RSFT_T(KC_SPC),  KC_MPLY
+                  KC_SLEP, LT(_LO, KC_ENT), LT(_SC, KC_ESC), KC_BTN2,      KC_BTN1, LT(_RA, KC_BSPC), RSFT_T(KC_SPC),  KC_MPLY
 ),
 
 
@@ -62,9 +62,9 @@ void keyboard_post_init_user(void) {
       KC_TAB,
     };
     dynamic_keymap_set_combo(0, &tab);
-    // vial_combo_entry_t btn3 = {
-    //   {KC_BTN1, KC_BTN1, KC_NO, KC_NO},
-    //   KC_BTN3,
-    // };
-    // dynamic_keymap_set_combo(1, &btn3);
+    vial_combo_entry_t btn3 = {
+      {KC_BTN1, KC_BTN2, KC_NO, KC_NO},
+      KC_BTN3,
+    };
+    dynamic_keymap_set_combo(1, &btn3);
 }

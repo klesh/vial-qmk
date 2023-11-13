@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-2.0
 
 #include QMK_KEYBOARD_H
+#include "quantum/qmk_settings.h"
 
 // Defines names for use in layer keycodes and the keymap
 enum layer_names {
@@ -67,4 +68,8 @@ void keyboard_post_init_user(void) {
       KC_BTN3,
     };
     dynamic_keymap_set_combo(1, &btn3);
+    char taphold_permissive_hold = 1 << 0;
+    char taphold_ignore_mod_tap_interrupt= 1 << 1;
+    char taphold_qsid_8 = taphold_permissive_hold | taphold_ignore_mod_tap_interrupt;
+    qmk_settings_set(8, &taphold_qsid_8, sizeof(taphold_qsid_8));
 }

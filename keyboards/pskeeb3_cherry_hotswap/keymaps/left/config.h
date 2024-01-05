@@ -5,9 +5,6 @@
 #define VIAL_UNLOCK_COMBO_ROWS { 0, 4 }
 #define VIAL_UNLOCK_COMBO_COLS { 4, 4 }
 
-/* default layer count */
-#define DYNAMIC_KEYMAP_LAYER_COUNT 4
-
 #define HAL_USE_I2C TRUE
 #define I2C_DRIVER I2CD1
 #define I2C1_SDA_PIN GP10

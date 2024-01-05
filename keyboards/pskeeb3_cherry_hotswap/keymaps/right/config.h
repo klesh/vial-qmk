@@ -5,9 +5,6 @@
 #define VIAL_UNLOCK_COMBO_ROWS { 0, 4 }
 #define VIAL_UNLOCK_COMBO_COLS { 4, 4 }
 
-/* default layer count */
-#define DYNAMIC_KEYMAP_LAYER_COUNT 4
-
 /* trackpoint */
 #define PS2_DATA_PIN GP10
 #define PS2_CLOCK_PIN GP11

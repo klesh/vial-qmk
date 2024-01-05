@@ -3,6 +3,8 @@
 
 #pragma once
 
+#define DYNAMIC_KEYMAP_LAYER_COUNT 8
+
 /* key matrix size */
 #define MATRIX_ROWS 8
 #define MATRIX_COLS 5
@@ -10,7 +12,7 @@
 #define SERIAL_USART_FULL_DUPLEX   // Enable full duplex operation mode.
 #define SERIAL_USART_TX_PIN GP12     // USART TX pin
 #define SERIAL_USART_RX_PIN GP13     // USART RX pin
-// #define SERIAL_PIO_USE_PIO1 
+// #define SERIAL_PIO_USE_PIO1
 
 /* Top left key on left half */
 #define BOOTMAGIC_LITE_ROW    0

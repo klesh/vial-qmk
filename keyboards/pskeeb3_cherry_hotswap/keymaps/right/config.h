@@ -2,6 +2,8 @@
 /* keyboard uid */
 #define VIAL_KEYBOARD_UID {0xEE, 0x7E, 0x02, 0x5F, 0x78, 0xF7, 0x19, 0xFE}
 
+#define DYNAMIC_KEYMAP_LAYER_COUNT 8
+
 #define VIAL_UNLOCK_COMBO_ROWS { 0, 4 }
 #define VIAL_UNLOCK_COMBO_COLS { 4, 4 }
 

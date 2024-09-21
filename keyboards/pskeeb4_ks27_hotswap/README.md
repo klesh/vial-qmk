@@ -1,6 +1,6 @@
-# pskeeb3 cherry hotswap
+# pskeeb4 cherry hotswap
 
-The Portable Split Keeb is a 36 key diodeless split keyboard, designed with simplicity and portability in mind, aiming to provide a more ergonomic (stronger column stagger) corne-like layout with a simple, yet powerful, easy to assemble and cheap design.. It is inspired by the following projects:
+The Portable Split Keeb is a 36 key split keyboard, designed with simplicity and portability in mind, aiming to provide a more ergonomic (stronger column stagger) corne-like layout with a simple, yet powerful, easy to assemble and cheap design.. It is inspired by the following projects:
 
  - [corne](https://github.com/foostan/crkbd)
  - [cantor](https://github.com/diepala/cantor)
@@ -8,13 +8,12 @@ The Portable Split Keeb is a 36 key diodeless split keyboard, designed with simp
 
 
 * Keyboard Maintainer: [Klesh Wong](https://github.com/klesh)
-* Hardware Supported: Raspberry Pi Pico
+* Hardware Supported: RP2040-Zero
 * Hardware Availability: https://github.com/diepala/pskeeb
 
 Make example for this keyboard (after setting up your build environment):
 
-    make pskeeb3_cherry_hotswap:left
-    make pskeeb3_cherry_hotswap:right
+    make pskeeb4_gtr_lp_ks27_hotswap:vial
 
 Flashing example for this keyboard:
 

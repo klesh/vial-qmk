@@ -11,7 +11,7 @@ The Portable Split Keeb is a 36 key diodeless split keyboard, designed with simp
 
 * Keyboard Maintainer: [Klesh Wong](https://github.com/klesh)
 * Hardware Supported: Blackpill STM32F401
-* Hardware Availability: https://github.com/diepala/pskeeb2
+* Hardware Availability: https://github.com/diepala/pskeeb
 
 Make example for this keyboard (after setting up your build environment):
 

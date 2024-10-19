@@ -131,6 +131,14 @@ bool             pmw3610_check_signature(void);
 
 #define TSWW_US                        30
 #define TSWR_US                        20
+#define T_NCS_SCLK_US                   1
 
+#define PMW3610_SHUTTER_H_POS           5
+#define PMW3610_SHUTTER_L_POS           5
+
+#define PMW3610_X_L_POS        1
+#define PMW3610_Y_L_POS        2
+#define PMW3610_XY_H_POS       3
 // clang-format on
 
+#define TOINT16(val, bits) (((struct {int16_t value: bits;}){val}).value)

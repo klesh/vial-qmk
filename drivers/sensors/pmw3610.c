@@ -23,28 +23,25 @@
 #include <stdio.h>
 #include "_wait.h"
 #include "config.h"
-#include "pico/assert.h"
 #include "print.h"
-#include "wait.h"
-#include "debug.h"
 #include "gpio.h"
-#include "spi_master.h"
-
-void pmw3610_cs_select(void) {
-    writePinLow(PMW3610_CS_PIN);
-}
-
-void pmw3610_cs_deselect(void) {
-    writePinHigh(PMW3610_CS_PIN);
-}
 
 static uint8_t self_test_result = 0;
 
 #define SELF_TEST_FAILED ((self_test_result & 0x0F) != 0x0F)
 
+void pmw3610_cs_select(void) {
+    writePinLow(PMW3610_CS_PIN);
+    wait_us(T_NCS_SCLK_US);
+}
+
+void pmw3610_cs_deselect(void) {
+    wait_us(T_NCS_SCLK_US);
+    writePinHigh(PMW3610_CS_PIN);
+}
+
 void pmw3610_init(void) {
     // Initialize sensor serial pins.
-    print("pmw3610_init start");
     setPinOutput(PMW3610_SCLK_PIN);
     setPinOutput(PMW3610_SDIO_PIN);
     setPinOutput(PMW3610_CS_PIN);
@@ -87,13 +84,9 @@ void pmw3610_init(void) {
     pmw3610_write_reg(REG_PERFORMANCE, 0x0d);
 
     // configuration (required in datasheet)
-    pmw3610_write_reg(REG_RUN_DOWNSHIFT, 0x04);
+    pmw3610_write_reg(REG_RUN_DOWNSHIFT, 16);
     pmw3610_write_reg(REG_REST1_RATE, 0x04);
     pmw3610_write_reg(REG_REST1_DOWNSHIFT, 0x0f);
-
-    // pmw3610_set_cpi(PMW3610_CPI);
-
-    printf("pmw3610_init done\n");
 }
 
 uint8_t pmw3610_serial_read(void) {
@@ -167,7 +160,12 @@ void pmw3610_write_reg(uint8_t reg_addr, uint8_t data) {
     pmw3610_cs_deselect();
 }
 
+
 report_pmw3610_t pmw3610_read_burst(void) {
+    // static uint32_t counter = 0;
+
+    // uprintf("start pmw3610_read_burst %lu\n", counter);  
+
     report_pmw3610_t data;
     data.dx = 0;
     data.dy = 0;
@@ -181,57 +179,61 @@ report_pmw3610_t pmw3610_read_burst(void) {
     pmw3610_serial_write(REG_BURST_READ);
     wait_us(4);
 
-    uint8_t buf[4];
-    for (uint8_t i = 0; i < 4; i++) {
+    uint8_t buf[8];
+    for (uint8_t i = 0; i < 8; i++) {
         buf[i] = pmw3610_serial_read();
     }
 
     pmw3610_cs_deselect();
     wait_us(1);
 
-    // int16_t x = TOINT16((buf[PMW3610_X_L_POS] + ((buf[PMW3610_XY_H_POS] & 0xF0) << 4)),12) / CONFIG_PMW3610_CPI_DIVIDOR;
-    // int16_t y = TOINT16((buf[PMW3610_Y_L_POS] + ((buf[PMW3610_XY_H_POS] & 0x0F) << 8)),12) / CONFIG_PMW3610_CPI_DIVIDOR;
-    // data.dx = x | (h & 0xf0 << 4);
-    // data.dy = y | (h & 0x0f << 8);
-    data.dx = convert_twoscomp(buf[1]);
-    data.dy = convert_twoscomp(buf[2]);
+    data.dx = TOINT16((buf[PMW3610_X_L_POS] + ((buf[PMW3610_XY_H_POS] & 0xF0) << 4)),12);
+    data.dy = TOINT16((buf[PMW3610_Y_L_POS] + ((buf[PMW3610_XY_H_POS] & 0x0F) << 8)),12);
+    // data.dx = convert_twoscomp(buf[1]);
+    // data.dy = convert_twoscomp(buf[2]);
+
     // if (buf[1] != 0 || buf[2] != 0) {
     //     uprintf("[pmw3610] reports x: %d, y: %d dx: %d, dy: %d\n", buf[1], buf[2], data.dx, data.dy);
     // }
 
+    /* begin smart algo for surface coverage */
+    static bool smart_flag = false;
+    int16_t shutter = ((int16_t)(buf[PMW3610_SHUTTER_H_POS] & 0x01) << 8)
+                      + buf[PMW3610_SHUTTER_L_POS];
+    if (smart_flag && shutter < 45 ) {
+      pmw3610_write_reg(0x32, 0x00);
+      smart_flag = false;
+    }
+    if (!smart_flag && shutter > 45 ) {
+      pmw3610_write_reg(0x32, 0x80);
+      smart_flag = true;
+    }
+    /* end smart algo for surface coverage */
+
+    // uprintf("end pmw3610_read_burst %lu\n", counter++);  
+
     return data;
 }
 
-// Convert a two's complement byte from an unsigned data type into a signed
-// data type.
-int8_t convert_twoscomp(uint8_t data) {
-    if ((data & 0x80) == 0x80)
-        return -128 + (data & 0x7F);
-    else
-        return data;
-}
-
 uint16_t pmw3610_get_cpi(void) {
-    pmw3610_write_reg(REG_SPI_PAGE0 , 0xff);
+    // pmw3610_write_reg(REG_SPI_PAGE0 , 0xff);
     // pmw3610_write_reg( REG_SPI_CLK_ON_REQ, PMW3610_SPI_CLOCK_CMD_ENABLE);
-    uint8_t cpival = pmw3610_read_reg(REG_RES_STEP);
+    // uint8_t cpival = pmw3610_read_reg(REG_RES_STEP);
     // 0x1F is an inversion of 0x20 which is 0b100000
+    // pmw3610_write_reg(REG_SPI_PAGE0 , 0x00);
+    // pmw3610_write_reg( REG_SPI_CLK_ON_REQ, PMW3610_SPI_CLOCK_CMD_DISABLE);
+
+    pmw3610_write_reg(REG_SPI_CLK_ON_REQ, PMW3610_SPI_CLOCK_CMD_ENABLE);
+    pmw3610_write_reg(REG_SPI_PAGE0, 0xff);
+    pmw3610_read_reg(REG_RES_STEP);
+    pmw3610_write_reg(REG_SPI_PAGE0, 0x00);
+    pmw3610_write_reg(REG_SPI_CLK_ON_REQ, PMW3610_SPI_CLOCK_CMD_DISABLE);
+    uint8_t cpival = pmw3610_serial_read();
+
     uint16_t cpi = (uint16_t)((cpival & 0x1F) * PMW3610_CPI_STEP);
     uprintf("get cpi: %d x %d = %d\n", cpival, PMW3610_CPI_STEP, cpi);
-    pmw3610_write_reg(REG_SPI_PAGE0 , 0x00);
-    // pmw3610_write_reg( REG_SPI_CLK_ON_REQ, PMW3610_SPI_CLOCK_CMD_DISABLE);
     return cpi;
 }
-
-// bool pmw3610_spi_start() {
-//     if (!spi_start(PMW3610_CS_PIN, false, 3, 64)) {
-//         spi_stop();
-//         return false;
-//     }
-//     // tNCS-SCLK, 10ns
-//     wait_us(1);
-//     return true;
-// }
 
 void pmw3610_set_cpi(uint16_t cpi) {
     uint8_t cpival = constrain((cpi / PMW3610_CPI_STEP) - 1U, 0, (PMW3610_CPI_MAX / PMW3610_CPI_STEP) - 1U);
@@ -243,24 +245,19 @@ void pmw3610_set_cpi(uint16_t cpi) {
     // pmw3610_write_reg( REG_SPI_CLK_ON_REQ, PMW3610_SPI_CLOCK_CMD_ENABLE);
 
 	/* write data */
-    pmw3610_cs_select();
-    pmw3610_serial_write(0b10000000 | REG_SPI_CLK_ON_REQ);
-    pmw3610_serial_write(PMW3610_SPI_CLOCK_CMD_ENABLE);
-        wait_us(TSWW_US);
+    pmw3610_write_reg(REG_SPI_CLK_ON_REQ, PMW3610_SPI_CLOCK_CMD_ENABLE);
 
 	for (size_t i = 0; i < 3; i++) {
-        pmw3610_serial_write(addr[i]);
-        wait_us(TSWW_US);
-        pmw3610_serial_write(data[i]);
-        wait_us(TSWW_US);
+        pmw3610_write_reg(addr[i], data[i]);
 	}
 
-    wait_ms(1);
-    pmw3610_cs_deselect();
+    pmw3610_write_reg(REG_SPI_CLK_ON_REQ, PMW3610_SPI_CLOCK_CMD_DISABLE);
+    // wait_ms(1);
 
   // disable spi clock to save power
     // pmw3610_write_reg( REG_SPI_CLK_ON_REQ, PMW3610_SPI_CLOCK_CMD_DISABLE);
     uprintf("set cpi to: %d / %d = %d\n", cpi, PMW3610_CPI_STEP, cpival);
+    // pmw3610_get_cpi();
 }
 
 bool pmw3610_check_signature(void) {

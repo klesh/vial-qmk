@@ -81,10 +81,10 @@ void pmw3610_init(void) {
 
     // set performace register: run mode, vel_rate, poshi_rate, poslo_rate
     // use the recommended value in datasheet: normal, 4ms, 4ms, 4ms
-    pmw3610_write_reg(REG_PERFORMANCE, 0x0d);
+    pmw3610_write_reg(REG_PERFORMANCE, 0xfd);
 
     // configuration (required in datasheet)
-    pmw3610_write_reg(REG_RUN_DOWNSHIFT, 16);
+    pmw3610_write_reg(REG_RUN_DOWNSHIFT, 0x04);
     pmw3610_write_reg(REG_REST1_RATE, 0x04);
     pmw3610_write_reg(REG_REST1_DOWNSHIFT, 0x0f);
 }
@@ -236,28 +236,20 @@ uint16_t pmw3610_get_cpi(void) {
 }
 
 void pmw3610_set_cpi(uint16_t cpi) {
-    uint8_t cpival = constrain((cpi / PMW3610_CPI_STEP) - 1U, 0, (PMW3610_CPI_MAX / PMW3610_CPI_STEP) - 1U);
-    // set the cpi
+    uint8_t cpival = constrain(cpi / PMW3610_CPI_STEP, 1, (PMW3610_CPI_MAX / PMW3610_CPI_STEP) - 1U);
+    // construct the data
     uint8_t addr[] = {REG_SPI_PAGE0, REG_RES_STEP, REG_SPI_PAGE0};
     uint8_t data[] = {0xff, cpival, 0x00};
 
     // enable spi clock
-    // pmw3610_write_reg( REG_SPI_CLK_ON_REQ, PMW3610_SPI_CLOCK_CMD_ENABLE);
-
-	/* write data */
     pmw3610_write_reg(REG_SPI_CLK_ON_REQ, PMW3610_SPI_CLOCK_CMD_ENABLE);
-
+	/* write data */
 	for (size_t i = 0; i < 3; i++) {
         pmw3610_write_reg(addr[i], data[i]);
 	}
-
-    pmw3610_write_reg(REG_SPI_CLK_ON_REQ, PMW3610_SPI_CLOCK_CMD_DISABLE);
-    // wait_ms(1);
-
   // disable spi clock to save power
-    // pmw3610_write_reg( REG_SPI_CLK_ON_REQ, PMW3610_SPI_CLOCK_CMD_DISABLE);
+    pmw3610_write_reg(REG_SPI_CLK_ON_REQ, PMW3610_SPI_CLOCK_CMD_DISABLE);
     uprintf("set cpi to: %d / %d = %d\n", cpi, PMW3610_CPI_STEP, cpival);
-    // pmw3610_get_cpi();
 }
 
 bool pmw3610_check_signature(void) {

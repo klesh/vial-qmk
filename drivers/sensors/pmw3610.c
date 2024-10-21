@@ -80,7 +80,7 @@ void pmw3610_init(void) {
     // pmw3610_read_burst();
 
     // set performace register: run mode, vel_rate, poshi_rate, poslo_rate
-    // use the recommended value in datasheet: normal, 4ms, 4ms, 4ms
+    // use the recommended value in datasheet: force awake, 4ms, 4ms, 4ms
     pmw3610_write_reg(REG_PERFORMANCE, 0xfd);
 
     // configuration (required in datasheet)

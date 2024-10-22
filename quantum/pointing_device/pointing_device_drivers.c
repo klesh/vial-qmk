@@ -72,6 +72,28 @@ const pointing_device_driver_t pointing_device_driver = {
 };
 // clang-format on
 
+#elif defined(POINTING_DEVICE_DRIVER_pmw3610)
+report_mouse_t pmw3610_get_report(report_mouse_t mouse_report) {
+    report_pmw3610_t data = pmw3610_read_burst();
+
+    if (data.dx != 0 || data.dy != 0) {
+        pd_dprintf("Raw ] X: %d, Y: %d\n", data.dx, data.dy);
+        mouse_report.x = (mouse_xy_report_t)data.dx;
+        mouse_report.y = (mouse_xy_report_t)data.dy;
+    }
+
+    return mouse_report;
+}
+
+// clang-format off
+const pointing_device_driver_t pointing_device_driver = {
+    .init         = pmw3610_init,
+    .get_report   = pmw3610_get_report,
+    .set_cpi      = pmw3610_set_cpi,
+    .get_cpi      = pmw3610_get_cpi,
+};
+// clang-format on
+
 #elif defined(POINTING_DEVICE_DRIVER_adns9800)
 
 report_mouse_t adns9800_get_report_driver(report_mouse_t mouse_report) {

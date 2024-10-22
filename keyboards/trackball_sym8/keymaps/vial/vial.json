@@ -1,0 +1,83 @@
+{
+  "name": "trackball_sym8",
+  "vendorId": "0xFEED",
+  "productId": "0x9101",
+  "matrix": {
+    "rows": 4,
+    "cols": 2
+  },
+  "customKeycodes": [
+    {
+      "name": "Increase DPI",
+      "title": "Increase DPI for the Default mode",
+      "shortName": "DPI\nUp"
+    },
+    {
+      "name": "Decrease DPI",
+      "title": "Decrease DPI for the Default mode",
+      "shortName": "DPI\nDown"
+    },
+    {
+      "name": "Increase Sniping DPI",
+      "title": "Increase DPI for the snping mode",
+      "shortName": "Sniping\nDPI\nUp"
+    },
+    {
+      "name": "Decrease Sniping DPI",
+      "title": "Decrease DPI for the sniping mode",
+      "shortName": "Sniping\nDPI\nDown"
+    },
+    {
+      "name": "Temporary activate the Sniping Mode",
+      "title": "Activate Sniping Mode when held",
+      "shortName": "Sniping"
+    },
+    {
+      "name": "Toggle the Sniping Mode",
+      "title": "Toggle Sniping Mode",
+      "shortName": "Toggle\nSniping"
+    },
+    {
+      "name": "Temporary activate the Drag Scroll Mode",
+      "title": "Activate Drag Scroll Mode when held",
+      "shortName": "Scroll"
+    },
+    {
+      "name": "Toggle the Drag Scroll Mode",
+      "title": "Toggle Drag Scroll Mode",
+      "shortName": "Toggle\nScroll"
+    }
+  ],
+  "layouts": {
+    "keymap": [
+      [
+        {
+          "x": 1
+        },
+        "0,0",
+        "0,1"
+      ],
+      [
+        "1,0",
+        {
+          "x": 2
+        },
+        "1,1"
+      ],
+      [
+        "2,0",
+        {
+          "x": 2
+        },
+        "2,1"
+      ],
+      [
+        {
+          "x": 1
+        },
+        "3,0",
+        "3,1"
+      ]
+    ]
+  }
+}

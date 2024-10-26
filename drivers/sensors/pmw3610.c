@@ -110,6 +110,9 @@ void pmw3610_init(void) {
     //     wait_ms(1);
     //     pmw3610_write_reg(REG_REST1_DOWNSHIFT, 0x0f);
     // }
+    // looks like QMK would call the set_cpi right after init, which might cause
+    // the sensor to act weirdly - movement stuttering, etc. delay 200ms to avoid that
+    wait_ms(200);
 
     init_step = -1; // success
 }

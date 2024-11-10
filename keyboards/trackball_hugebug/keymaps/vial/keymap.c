@@ -16,13 +16,15 @@ enum layer_names {
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_RH] = LAYOUT_default(
   KC_BTN1,                                                  KC_BTN2,
-  LT(_RA, KC_WBAK),                                         KC_WFWD
+  LT(_RA, KC_WBAK),                                         KC_WFWD,
+  KC_BTN3
 ),
 
 
 [_LH] = LAYOUT_default(
   KC_BTN2,                                                  KC_BTN1,
-  KC_WFWD,                                                  LT(_RA, KC_WBAK)
+  KC_WFWD,                                                  LT(_RA, KC_WBAK),
+  KC_BTN3
 ),
 
 
@@ -30,7 +32,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   // POINTER_SNIPING_DPI_FORWARD,                              POINTER_DEFAULT_DPI_FORWARD,
   // POINTER_SNIPING_DPI_REVERSE,                              POINTER_DEFAULT_DPI_REVERSE
   KC_BTN1,                                                  KC_BTN2,
-  LT(_RA, KC_WBAK),                                         KC_WFWD
+  LT(_RA, KC_WBAK),                                         KC_WFWD,
+  KC_BTN3
 ),
 
 };

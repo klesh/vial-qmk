@@ -26,9 +26,6 @@
 #include "print.h"
 #include "gpio.h"
 
-static uint8_t self_test_result = 0;
-
-#define SELF_TEST_FAILED ((self_test_result & 0x0F) != 0x0F)
 
 void pmw3610_cs_select(void) {
     writePinLow(PMW3610_CS_PIN);
@@ -40,7 +37,22 @@ void pmw3610_cs_deselect(void) {
     writePinHigh(PMW3610_CS_PIN);
 }
 
-static int init_step = 0;
+static inline bool ensure_reg(uint8_t reg_addr, uint8_t data) {
+    uint8_t counter = 0;
+    while (counter < 10) {
+        uint8_t read_data = pmw3610_read_reg(reg_addr);
+        if (read_data == data) {
+            return true;
+        }
+        counter++;
+        pmw3610_write_reg(reg_addr, data);
+        wait_ms(1);
+    }
+    return false;
+}
+
+static char* pmw3610_status;
+
 
 void pmw3610_init(void) {
     // Initialize sensor serial pins.
@@ -52,69 +64,57 @@ void pmw3610_init(void) {
     wait_ms(10);
     pmw3610_cs_deselect();
     pmw3610_cs_select();
-    init_step = 1;
+    pmw3610_status = "spi reset";
 
     /* not required in datashet, but added any way to have a clear state */
     // pmw3610_write_reg(REG_POWER_UP_RESET, PMW3610_POWERUP_CMD_RESET);
     // wait_ms(200);
-    // init_step = 2;
-
-    // wait maximum time before sensor is ready.
-    // this ensures that the sensor is actually ready after reset.
+    // pmw3610_status = "power up reset";
 
     // ask pmw3610 to perform the self-test
     wait_ms(50);
     pmw3610_write_reg(REG_OBSERVATION1, 0x00);
-    init_step = 3;
+    pmw3610_status = "initiate self test";
 
     // check if self-test passed
-    while (SELF_TEST_FAILED) {
+    uint8_t self_test_result = 0;
+    uint8_t self_test_counter = 0;
+    while ((self_test_result & 0x0F) != 0x0F && self_test_counter < 100) {
         wait_ms(10);
         self_test_result = pmw3610_read_reg(REG_OBSERVATION1);
+        self_test_counter++;
     }
-    init_step = 4;
+    pmw3610_status = "self test passed";
 
-    // clear motion registers first (required in datasheet)
+    // clear registers first (required in datasheet)
     for (uint8_t reg = REG_MOTION; (reg <= REG_DELTA_XY_H); reg++) {
         pmw3610_read_reg(reg);
     }
-    init_step = 5;
-
+    pmw3610_status = "registers cleared";
 
     // read a burst from the sensor and then discard it.
     // gets the sensor ready for write commands
     // (for example, setting the dpi).
-    // pmw3610_read_burst();
+    pmw3610_read_burst();
+    pmw3610_status = "burst read and discard";
 
-    // set performace register: run mode, vel_rate, poshi_rate, poslo_rate
-    // use the recommended value in datasheet: force awake, 4ms, 4ms, 4ms
-    while (pmw3610_read_reg(REG_PERFORMANCE) != 0xf1) {
-        wait_ms(1);
-        pmw3610_write_reg(REG_PERFORMANCE, 0xf1);
-    }
-    init_step = 6;
 
-    // configuration (required in datasheet)
-    // while (pmw3610_read_reg(REG_RUN_DOWNSHIFT) != 0x04) {
-    //     wait_ms(1);
-    //     pmw3610_write_reg(REG_RUN_DOWNSHIFT, 0x04);
-    
-    // }
-    // init_step = 7;
-    // while (pmw3610_read_reg(REG_REST1_RATE) != 0x04) {
-    //     wait_ms(1);
-    //     pmw3610_write_reg(REG_REST1_RATE, 0x04);
-    // }
-    // init_step = 8;
-    // while (pmw3610_read_reg(REG_REST1_DOWNSHIFT) != 0x0f) {
-    //     wait_ms(1);
-    //     pmw3610_write_reg(REG_REST1_DOWNSHIFT, 0x0f);
-    // }
+    // set performance to force awake
+    ensure_reg(REG_PERFORMANCE, 0xf1);
+    pmw3610_status = "set performance";
+
+
+    ensure_reg(REG_RUN_DOWNSHIFT, 0x04);
+    pmw3610_status = "run_downshift set";
+
+    ensure_reg(REG_REST1_RATE, 0x04);
+    ensure_reg(REG_REST1_DOWNSHIFT, 0x0f);
+
     // looks like QMK would call the set_cpi right after init, which might cause
     // the sensor to act weirdly - movement stuttering, etc. delay 200ms to avoid that
     wait_ms(200);
 
-    init_step = -1; // success
+    pmw3610_status = NULL;
 }
 
 uint8_t pmw3610_serial_read(void) {
@@ -190,22 +190,14 @@ void pmw3610_write_reg(uint8_t reg_addr, uint8_t data) {
 
 
 report_pmw3610_t pmw3610_read_burst(void) {
-    if (init_step != -1) {
-        if (init_step != -2) {
-            uprintf("pmw3610 not initialized, step: %d self test: %d\n", init_step, self_test_result);
-            init_step = -2;
-        }
-        return (report_pmw3610_t){0, 0};
-    }
-
     report_pmw3610_t data;
     data.dx = 0;
     data.dy = 0;
-    if (SELF_TEST_FAILED) {
-        uprintf("self test failed: %d\n", self_test_result);
+
+    if (pmw3610_status != NULL) {
+        uprintf("pmw3610 failed to initialize, status: %s\n", pmw3610_status);
         return data;
     }
-
 
     pmw3610_cs_select();
     pmw3610_serial_write(REG_BURST_READ);
@@ -221,12 +213,6 @@ report_pmw3610_t pmw3610_read_burst(void) {
 
     data.dx = TOINT16((buf[PMW3610_X_L_POS] + ((buf[PMW3610_XY_H_POS] & 0xF0) << 4)),12);
     data.dy = TOINT16((buf[PMW3610_Y_L_POS] + ((buf[PMW3610_XY_H_POS] & 0x0F) << 8)),12);
-    // data.dx = convert_twoscomp(buf[1]);
-    // data.dy = convert_twoscomp(buf[2]);
-
-    // if (buf[1] != 0 || buf[2] != 0) {
-    //     uprintf("[pmw3610] reports x: %d, y: %d dx: %d, dy: %d\n", buf[1], buf[2], data.dx, data.dy);
-    // }
 
     /* begin smart algo for surface coverage */
     static bool smart_flag = false;
@@ -242,40 +228,17 @@ report_pmw3610_t pmw3610_read_burst(void) {
     }
     /* end smart algo for surface coverage */
 
-    // uprintf("end pmw3610_read_burst %lu\n", counter++);  
-
     return data;
 }
 
 uint16_t pmw3610_get_cpi(void) {
-    // pmw3610_write_reg(REG_SPI_CLK_ON_REQ, PMW3610_SPI_CLOCK_CMD_ENABLE);
-    // pmw3610_write_reg(REG_SPI_PAGE0, 0xff);
-    // uint8_t cpival = pmw3610_read_reg(REG_RES_STEP);
-    // pmw3610_write_reg(REG_SPI_PAGE0, 0x00);
-    // pmw3610_write_reg(REG_SPI_CLK_ON_REQ, PMW3610_SPI_CLOCK_CMD_DISABLE);
-
-    // uint16_t cpi = (uint16_t)((cpival & 0x1F) * PMW3610_CPI_STEP);
-    // uprintf("get cpi: %d x %d = %d\n", cpival, PMW3610_CPI_STEP, cpi);
-    // return cpi;
+    // I have no idea how to retrieve the cpi value from the sensor because
+    // the CONFIDENTIAL datasheet doesn't provide any information about it.
+    // YES, the datasheet is CONFIDENTIAL! Pixart, really? why?
     return 1;
 }
 
 void pmw3610_set_cpi(uint16_t cpi) {
-
-    static int16_t cpi_history[10][2] = {{0, 0}};
-    static int8_t cpi_index = 0;
-    cpi_history[cpi_index][0] = cpi;
-    cpi_history[cpi_index][1] = init_step;
-    cpi_index = (cpi_index + 1) % 10;
-    for (int i = 0; i < 10; i++) {
-        if (i == cpi_index) {
-            uprintf(" > ");
-        } else {
-            uprintf("   ");
-        }
-        uprintf("cpi history %d: cpi %d init_step %d\n", i, cpi_history[i][0], cpi_history[i][1]);
-    }
-
     uint8_t cpival = constrain(cpi / PMW3610_CPI_STEP, 1, (PMW3610_CPI_MAX / PMW3610_CPI_STEP) - 1U);
     // construct the data
     uint8_t addr[] = {REG_SPI_PAGE0, REG_RES_STEP, REG_SPI_PAGE0};
@@ -283,17 +246,16 @@ void pmw3610_set_cpi(uint16_t cpi) {
 
     // enable spi clock
     pmw3610_write_reg(REG_SPI_CLK_ON_REQ, PMW3610_SPI_CLOCK_CMD_ENABLE);
-	/* write data */
+	// write data
 	for (size_t i = 0; i < 3; i++) {
         pmw3610_write_reg(addr[i], data[i]);
 	}
-  // disable spi clock to save power
+    // disable spi clock to save power
     pmw3610_write_reg(REG_SPI_CLK_ON_REQ, PMW3610_SPI_CLOCK_CMD_DISABLE);
     uprintf("set cpi to: %d / %d = %d\n", cpi, PMW3610_CPI_STEP, cpival);
 }
 
 bool pmw3610_check_signature(void) {
     uint8_t pid  = pmw3610_read_reg(REG_PRODUCT_ID);
-
     return pid == 0x3e;
 }

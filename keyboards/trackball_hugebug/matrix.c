@@ -20,8 +20,8 @@ typedef uint32_t matrix_row_mask_t;
 #    define TOUCH_TIMEOUT_US 100
 #endif
 
-#ifndef CAPACITIVE_THRESHOLD_RATIO
-#    define CAPACITIVE_THRESHOLD_RATIO 2
+#ifndef CAPACITIVE_THRESHOLD_SCALE
+#    define CAPACITIVE_THRESHOLD_SCALE 2
 #endif
 
 #ifndef COUNT_LIMIT
@@ -81,7 +81,7 @@ uint8_t capacitive_sample_untouch_threshold(pin_t output_pin, pin_t input_pin, b
         uint8_t count = capacitive_get_count(output_pin, input_pin, polarity);
         if (count > threshold) threshold = count;
     }
-    return threshold * CAPACITIVE_THRESHOLD_RATIO;
+    return threshold * CAPACITIVE_THRESHOLD_SCALE;
 }
 
 void matrix_init_custom(void) {
@@ -98,7 +98,14 @@ void matrix_init_custom(void) {
             pin_t input_pin  = direct_pins[row][1];
             gpio_set_pin_output(output_pin);
             gpio_set_pin_input(input_pin);
-            capacitive_rows_thresholds[row] = capacitive_sample_untouch_threshold(output_pin, input_pin, POLARITY_MODE);
+            uint8_t threshold = capacitive_sample_untouch_threshold(output_pin, input_pin, POLARITY_MODE);
+            if (threshold == COUNT_LIMIT) {
+                // failed to get a good threshold, disable capacitive sensing
+                uprintf("Failed to get a good threshold for row %d, disabling capacitive sensing\n", row);
+                capacitive_rows_mask &= ~(1 << row);
+            } else {
+                capacitive_rows_thresholds[row] = threshold;
+            }
         } else {
             for (int col = 0; col < MATRIX_COLS; col++) {
                 pin_t pin = direct_pins[row][col];

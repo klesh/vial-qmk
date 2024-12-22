@@ -1,0 +1,3 @@
+SERIAL_DRIVER = vendor
+SPLIT_KEYBOARD = yes
+ENCODER_ENABLE = yes

@@ -1,0 +1,7 @@
+VIA_ENABLE  = yes    # Enable VIA
+VIAL_ENABLE = yes    # Enable VIAL
+ENCODER_MAP_ENABLE = yes
+LTO_ENABLE = yes
+TAP_DANCE_ENABLE = no
+COMBO_ENABLE = no
+KEY_OVERRIDE_ENABLE = no

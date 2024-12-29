@@ -62,16 +62,16 @@ void keyboard_post_init_user(void) {
     // debug_mouse=true;
     // debug_keyboard=true;
     // debug_matrix=true;
-    vial_combo_entry_t tab = {
-      {KC_E, KC_R, KC_NO, KC_NO},
-      KC_TAB,
-    };
-    dynamic_keymap_set_combo(0, &tab);
-    vial_combo_entry_t btn3 = {
-      {KC_BTN1, KC_BTN2, KC_NO, KC_NO},
-      KC_BTN3,
-    };
-    dynamic_keymap_set_combo(1, &btn3);
+    // vial_combo_entry_t tab = {
+    //   {KC_E, KC_R, KC_NO, KC_NO},
+    //   KC_TAB,
+    // };
+    // dynamic_keymap_set_combo(0, &tab);
+    // vial_combo_entry_t btn3 = {
+    //   {KC_BTN1, KC_BTN2, KC_NO, KC_NO},
+    //   KC_BTN3,
+    // };
+    // dynamic_keymap_set_combo(1, &btn3);
     char taphold_permissive_hold = 1 << 0;
     char taphold_ignore_mod_tap_interrupt= 1 << 1;
     char taphold_qsid_8 = taphold_permissive_hold | taphold_ignore_mod_tap_interrupt;

@@ -88,3 +88,11 @@ bool trackball_get_pointer_dragscroll_enabled(void);
  * are translated into horizontal and vertical scroll movements.
  */
 void trackball_set_pointer_dragscroll_enabled(bool enable);
+
+/**
+ * \brief Enable/disable direction mode.
+ *
+ * When direction mode is enabled, horizontal and vertical pointer movements
+ * are translated into left/right and up/down key presses.
+ */
+void trackball_set_pointer_direction_enabled(bool enable);

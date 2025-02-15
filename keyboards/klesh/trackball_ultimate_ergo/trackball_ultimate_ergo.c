@@ -1,4 +1,5 @@
 #include "trackball_ultimate_ergo.h"
+#include "action.h"
 #include <string.h>
 
 #ifdef CONSOLE_ENABLE
@@ -7,8 +8,13 @@
 
 #ifdef POINTING_DEVICE_ENABLE
 #    ifndef TRACKBALL_MINIMUM_DEFAULT_DPI
-#        define TRACKBALL_MINIMUM_DEFAULT_DPI 500
+#        define TRACKBALL_MINIMUM_DEFAULT_DPI 125
 #    endif // TRACKBALL_MINIMUM_DEFAULT_DPI
+
+
+#    ifndef TRACKBALL_MAXIMUM_STEPS
+#        define TRACKBALL_MAXIMUM_STEPS 10
+#    endif // TRACKBALL_MAXIMUM_STEPS
 
 #    ifndef TRACKBALL_DEFAULT_DPI_CONFIG_STEP
 #        define TRACKBALL_DEFAULT_DPI_CONFIG_STEP 125
@@ -19,7 +25,7 @@
 #    endif // TRACKBALL_MINIMUM_SNIPER_MODE_DPI
 
 #    ifndef TRACKBALL_SNIPING_DPI_CONFIG_STEP
-#        define TRACKBALL_SNIPING_DPI_CONFIG_STEP 1375
+#        define TRACKBALL_SNIPING_DPI_CONFIG_STEP 125
 #    endif // TRACKBALL_SNIPING_DPI_CONFIG_STEP
 
 // Fixed DPI for drag-scroll.
@@ -31,6 +37,10 @@
 #        define TRACKBALL_DRAGSCROLL_BUFFER_SIZE 6
 #    endif // !TRACKBALL_DRAGSCROLL_BUFFER_SIZE
 
+#    ifndef TRACKBALL_DIRECTION_BUFFER_SIZE
+#        define TRACKBALL_DIRECTION_BUFFER_SIZE 12
+#    endif // !TRACKBALL_DIRECTION_BUFFER_SIZE
+
 typedef union {
     uint8_t raw;
     struct {
@@ -38,6 +48,7 @@ typedef union {
         uint8_t pointer_sniping_dpi : 2; // 4 steps available.
         bool    is_dragscroll_enabled : 1;
         bool    is_sniping_enabled : 1;
+        bool    is_direction_enabled: 1;
     } __attribute__((packed));
 } trackball_config_t;
 
@@ -81,7 +92,7 @@ static uint16_t get_pointer_sniping_dpi(trackball_config_t* config) {
 
 /** \brief Set the appropriate DPI for the input config. */
 static void maybe_update_pointing_device_cpi(trackball_config_t* config) {
-    if (config->is_dragscroll_enabled) {
+    if (config->is_dragscroll_enabled || config->is_direction_enabled) {
         pointing_device_set_cpi(TRACKBALL_DRAGSCROLL_DPI);
     } else if (config->is_sniping_enabled) {
         pointing_device_set_cpi(get_pointer_sniping_dpi(config));
@@ -156,6 +167,12 @@ void trackball_set_pointer_dragscroll_enabled(bool enable) {
     maybe_update_pointing_device_cpi(&g_trackball_config);
 }
 
+void trackball_set_pointer_direction_enabled(bool enable) {
+    g_trackball_config.is_direction_enabled = enable;
+    maybe_update_pointing_device_cpi(&g_trackball_config);
+}
+
+
 /**
  * \brief Augment the pointing device behavior.
  *
@@ -183,6 +200,30 @@ static void pointing_device_task_trackball(report_mouse_t* mouse_report) {
         }
         if (abs(scroll_buffer_y) > TRACKBALL_DRAGSCROLL_BUFFER_SIZE) {
             mouse_report->v = scroll_buffer_y > 0 ? 1 : -1;
+            scroll_buffer_y = 0;
+        }
+    }
+    if (g_trackball_config.is_direction_enabled) {
+#    ifdef TRACKBALL_DRAGSCROLL_REVERSE_X
+        scroll_buffer_x -= mouse_report->x;
+#    else
+        scroll_buffer_x += mouse_report->x;
+#    endif // TRACKBALL_DRAGSCROLL_REVERSE_X
+#    ifdef TRACKBALL_DRAGSCROLL_REVERSE_Y
+        scroll_buffer_y -= mouse_report->y;
+#    else
+        scroll_buffer_y += mouse_report->y;
+#    endif // TRACKBALL_DRAGSCROLL_REVERSE_Y
+        mouse_report->x = 0;
+        mouse_report->y = 0;
+        if (abs(scroll_buffer_x) > TRACKBALL_DIRECTION_BUFFER_SIZE) {
+            tap_code_delay(scroll_buffer_x > 0 ? KC_RGHT : KC_LEFT, 10);
+            scroll_buffer_x = 0;
+            scroll_buffer_y = 0;
+        }
+        if (abs(scroll_buffer_y) > TRACKBALL_DIRECTION_BUFFER_SIZE) {
+            tap_code_delay(scroll_buffer_x > 0 ? KC_DOWN : KC_UP, 10);
+            scroll_buffer_x = 0;
             scroll_buffer_y = 0;
         }
     }
@@ -225,11 +266,12 @@ static void debug_trackball_config_to_console(trackball_config_t* config) {
             "\t{\n"
             "\t\tis_dragscroll_enabled=%u\n"
             "\t\tis_sniping_enabled=%u\n"
+            "\t\tis_direction_enabled=%u\n"
             "\t\tdefault_dpi=0x%X (%u)\n"
             "\t\tsniping_dpi=0x%X (%u)\n"
             "\t}\n"
             "}\n",
-            config->raw, config->is_dragscroll_enabled, config->is_sniping_enabled, config->pointer_default_dpi, get_pointer_default_dpi(config), config->pointer_sniping_dpi, get_pointer_sniping_dpi(config));
+            config->raw, config->is_dragscroll_enabled, config->is_sniping_enabled, config->is_direction_enabled, config->pointer_default_dpi, get_pointer_default_dpi(config), config->pointer_sniping_dpi, get_pointer_sniping_dpi(config));
 #    endif // CONSOLE_ENABLE
 }
 

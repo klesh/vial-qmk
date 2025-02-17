@@ -222,7 +222,7 @@ static void pointing_device_task_trackball(report_mouse_t* mouse_report) {
             scroll_buffer_y = 0;
         }
         if (abs(scroll_buffer_y) > TRACKBALL_DIRECTION_BUFFER_SIZE) {
-            tap_code_delay(scroll_buffer_x > 0 ? KC_DOWN : KC_UP, 10);
+            tap_code_delay(scroll_buffer_y > 0 ? KC_UP : KC_DOWN, 10);
             scroll_buffer_x = 0;
             scroll_buffer_y = 0;
         }

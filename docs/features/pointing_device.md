@@ -267,6 +267,26 @@ The paw 3204 sensor uses a serial type protocol for communication, and requires 
 
 The CPI range is 400-1600, with supported values of (400, 500, 600, 800, 1000, 1200 and 1600).  Defaults to 1000 CPI.
 
+### PAW 3212 Sensor
+
+CAUTION: support only High-Voltage (3.3v) with 3-wires SPI configuration.
+
+To use the paw 3212 sensor, add this to your `rules.mk`
+
+```make
+POINTING_DEVICE_DRIVER = paw3212
+```
+
+The paw 3212 sensor uses a serial type protocol for communication, and requires an additional light source. 
+
+| Setting (`config.h`) | Description                                                         | Default                    |
+| -------------------- |-------------------------------------------------------------------- | -------------------------- |
+| `PAW3212_SCLK_PIN`   | (Required) The pin connected to the clock pin of the sensor.        | `POINTING_DEVICE_SCLK_PIN` |
+| `PAW3212_SDIO_PIN`   | (Required) The pin connected to the data pin of the sensor.         | `POINTING_DEVICE_SDIO_PIN` |
+| `PMW3312_CS_PIN`     | (Required) The pin connected to the cable select pin of the sensor. | `POINTING_DEVICE_CS_PIN`   |
+
+The CPI range is 152-2400
+
 ### Pimoroni Trackball
 
 To use the Pimoroni Trackball module, add this to your `rules.mk`:

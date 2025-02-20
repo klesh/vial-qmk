@@ -5,15 +5,15 @@
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [0] = LAYOUT_default(
-        MS_BTN2,  MS_BTN1,    LT(2, MS_BTN5),    LT(1, MS_BTN4),    MS_BTN4
+        LT(1, MS_BTN4), MS_BTN1,           MS_BTN2,         LT(2, MS_BTN5),     _______
     ),
 
     [1] = LAYOUT_default(
-        LCTL(KC_W),  LCTL(KC_HOME),    LCTL(KC_W),    MS_BTN4,    MS_BTN4
+        _______,        KC_LSFT,           LCTL(KC_W),      KC_LCTL,            _______
     ),
 
     [2] = LAYOUT_default(
-        DPI_RMOD,  DPI_MOD,    MS_BTN3,    MS_BTN4,    MS_BTN4
+        DPI_RMOD,       DPI_MOD,            _______,        _______,            _______
     )
 };
 

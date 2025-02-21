@@ -55,6 +55,9 @@ typedef struct {
 #elif defined(POINTING_DEVICE_DRIVER_paw3204)
 #    include "drivers/sensors/paw3204.h"
 #    define POINTING_DEVICE_MOTION_PIN_ACTIVE_LOW
+#elif defined(POINTING_DEVICE_DRIVER_paw3220)
+#    include "drivers/sensors/paw3220.h"
+#    define POINTING_DEVICE_MOTION_PIN_ACTIVE_LOW
 #elif defined(POINTING_DEVICE_DRIVER_pimoroni_trackball)
 #    include "i2c_master.h"
 #    include "drivers/sensors/pimoroni_trackball.h"

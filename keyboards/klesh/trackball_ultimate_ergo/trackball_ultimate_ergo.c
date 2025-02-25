@@ -8,29 +8,29 @@
 
 #ifdef POINTING_DEVICE_ENABLE
 #    ifndef TRACKBALL_MINIMUM_DEFAULT_DPI
-#        define TRACKBALL_MINIMUM_DEFAULT_DPI 125
+#        define TRACKBALL_MINIMUM_DEFAULT_DPI 200
 #    endif // TRACKBALL_MINIMUM_DEFAULT_DPI
 
 
 #    ifndef TRACKBALL_MAXIMUM_STEPS
-#        define TRACKBALL_MAXIMUM_STEPS 10
+#        define TRACKBALL_MAXIMUM_STEPS 16
 #    endif // TRACKBALL_MAXIMUM_STEPS
 
 #    ifndef TRACKBALL_DEFAULT_DPI_CONFIG_STEP
-#        define TRACKBALL_DEFAULT_DPI_CONFIG_STEP 125
+#        define TRACKBALL_DEFAULT_DPI_CONFIG_STEP 200
 #    endif // TRACKBALL_DEFAULT_DPI_CONFIG_STEP
 
 #    ifndef TRACKBALL_MINIMUM_SNIPING_DPI
-#        define TRACKBALL_MINIMUM_SNIPING_DPI 125
+#        define TRACKBALL_MINIMUM_SNIPING_DPI 200
 #    endif // TRACKBALL_MINIMUM_SNIPER_MODE_DPI
 
 #    ifndef TRACKBALL_SNIPING_DPI_CONFIG_STEP
-#        define TRACKBALL_SNIPING_DPI_CONFIG_STEP 125
+#        define TRACKBALL_SNIPING_DPI_CONFIG_STEP 200
 #    endif // TRACKBALL_SNIPING_DPI_CONFIG_STEP
 
 // Fixed DPI for drag-scroll.
 #    ifndef TRACKBALL_DRAGSCROLL_DPI
-#        define TRACKBALL_DRAGSCROLL_DPI 125
+#        define TRACKBALL_DRAGSCROLL_DPI 200
 #    endif // TRACKBALL_DRAGSCROLL_DPI
 
 #    ifndef TRACKBALL_DRAGSCROLL_BUFFER_SIZE
@@ -109,6 +109,9 @@ static void maybe_update_pointing_device_cpi(trackball_config_t* config) {
  */
 static void step_pointer_default_dpi(trackball_config_t* config, bool forward) {
     config->pointer_default_dpi += forward ? 1 : -1;
+    if (config->pointer_default_dpi >= TRACKBALL_MAXIMUM_STEPS) {
+        config->pointer_default_dpi = 0;
+    }
     maybe_update_pointing_device_cpi(config);
 }
 

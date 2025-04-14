@@ -127,7 +127,7 @@ void pmw3610_init(void) {
 bool pmw3610_check_pid(void) {
     uint8_t pid = pmw3610_read_reg(REG_PID); // read product id
     uint8_t vid = pmw3610_read_reg(REG_VID); // read revision id
-    dprintf("pmw3610 pid: %d vid: %d ob1: %d status: %d\n", pid, vid, status);
+    // dprintf("pmw3610 pid: %d vid: %d ob1: %d status: %d\n", pid, vid, status);
     return pid == 0x3e && vid == 0x01;
 }
 

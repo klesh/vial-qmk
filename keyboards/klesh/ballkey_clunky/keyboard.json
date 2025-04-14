@@ -1,0 +1,71 @@
+{
+    "manufacturer": "Klesh Wong",
+    "keyboard_name": "ballkey clunky",
+    "maintainer": "Klesh Wong",
+    "processor": "RP2040",
+    "bootloader": "rp2040",
+    "features": {
+        "bootmagic": true,
+        "command": false,
+        "console": true,
+        "extrakey": true,
+        "oled": false,
+        "mousekey": true,
+        "pointing_device": true,
+        "nkro": true
+    },
+    "matrix_pins": {
+        "direct": [
+            [
+                "GP5",
+                "GP6",
+                "GP7",
+                "GP8"
+            ]
+        ]
+    },
+    "url": "https://github.com/pskeeb",
+    "usb": {
+        "device_version": "1.0.0",
+        "pid": "0xFEED",
+        "vid": "0x8193"
+    },
+    "layouts": {
+        "LAYOUT_default": {
+            "layout": [
+                {
+                    "matrix": [
+                        0,
+                        0
+                    ],
+                    "x": 2,
+                    "y": 0
+                },
+                {
+                    "matrix": [
+                        0,
+                        1
+                    ],
+                    "x": 3,
+                    "y": 0
+                },
+                {
+                    "matrix": [
+                        0,
+                        2
+                    ],
+                    "x": 4,
+                    "y": 1
+                },
+                {
+                    "matrix": [
+                        0,
+                        3
+                    ],
+                    "x": 0,
+                    "y": 2
+                }
+            ]
+        }
+    }
+}

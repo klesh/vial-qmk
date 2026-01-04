@@ -1,0 +1,2 @@
+SERIAL_DRIVER = vendor
+VIAL_INSECURE = yes

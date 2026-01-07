@@ -4,6 +4,8 @@
 /* trackpoint */
 #define PS2_DATA_PIN GP26
 #define PS2_CLOCK_PIN GP27
+#define PS2_PINMODE_PULL_UP
+#define PS2_RESET_PIN GP15
 #define PS2_MOUSE_ROTATE 270
 #define PS2_DRIVER vendor
 #define PS2_PIO_USE_PIO1

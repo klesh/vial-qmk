@@ -77,3 +77,38 @@ void keyboard_post_init_user(void) {
     char taphold_qsid_8 = taphold_permissive_hold | taphold_ignore_mod_tap_interrupt;
     qmk_settings_set(8, &taphold_qsid_8, sizeof(taphold_qsid_8));
 }
+
+#ifdef OLED_ENABLE
+bool oled_task_user(void) {
+    static uint16_t start_timer = 0;
+    if (start_timer == 0) {
+        start_timer = timer_read();
+    }
+
+    oled_set_cursor(0, 0);
+
+    if (timer_elapsed(start_timer) < 3000) {
+        oled_write_P(PSTR("pskeeb.top"), false);
+        return false;
+    }
+
+    oled_write_P(PSTR("Layer: "), false);
+    switch (get_highest_layer(layer_state)) {
+        case _QW:
+            oled_write_P(PSTR("Base\n"), false);
+            break;
+        case _LO:
+            oled_write_P(PSTR("Lower\n"), false);
+            break;
+        case _RA:
+            oled_write_P(PSTR("Raise\n"), false);
+            break;
+        case _SC:
+            oled_write_P(PSTR("Scroll\n"), false);
+            break;
+        default:
+            oled_write_P(PSTR("Undef\n"), false);
+    }
+    return false;
+}
+#endif

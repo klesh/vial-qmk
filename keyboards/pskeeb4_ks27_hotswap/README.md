@@ -13,7 +13,7 @@ The Portable Split Keeb is a 36 key split keyboard, designed with simplicity and
 
 Make example for this keyboard (after setting up your build environment):
 
-    make pskeeb4_gtr_lp_ks27_hotswap:vial
+    make pskeeb4_ks27_hotswap:vial
 
 Flashing example for this keyboard:
 

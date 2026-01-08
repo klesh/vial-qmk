@@ -31,8 +31,6 @@
             ["GP15", "GP14", "GP16", "GP17", null]
         ]
     },
-<<<<<<< HEAD
-=======
     "rgb_matrix": {
         "driver": "ws2812",
         "split_count": [6, 6],
@@ -56,7 +54,6 @@
         "pin": "GP18",
         "driver": "vendor"
     },
->>>>>>> a0b7139b8a (fix: pskeeb2 cherry hotswap working)
     "layouts": {
         "LAYOUT_split_3x5_4": {
             "layout": [

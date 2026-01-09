@@ -59,7 +59,7 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
 
 void keyboard_post_init_user(void) {
     debug_enable=true;
-    debug_mouse=true;
+    // debug_mouse=true;
     debug_keyboard=true;
     debug_matrix=true;
     vial_combo_entry_t tab = {

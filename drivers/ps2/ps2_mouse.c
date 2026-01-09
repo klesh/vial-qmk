@@ -25,7 +25,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "report.h"
 #include "debug.h"
 #include "ps2.h"
-#include "action_layer.h"
 
 /* ============================= MACROS ============================ */
 
@@ -36,19 +35,16 @@ static inline void ps2_mouse_convert_report_to_hid(report_mouse_t *mouse_report)
 static inline void ps2_mouse_clear_report(report_mouse_t *mouse_report);
 static inline void ps2_mouse_enable_scrolling(void);
 static inline void ps2_mouse_scroll_button_task(report_mouse_t *mouse_report);
-static inline void ps2_mouse_scroll_layer_task(report_mouse_t *mouse_report);
 
 /* ============================= IMPLEMENTATION ============================ */
 
 /* supports only 3 button mouse at this time */
 void ps2_mouse_init(void) {
-    ps2_host_power_on_reset();
     ps2_host_init();
 
     wait_ms(PS2_MOUSE_INIT_DELAY); // wait for powering up
 
-    // Resetting is not required and it is causing errors
-    // PS2_MOUSE_SEND(PS2_MOUSE_RESET, "ps2_mouse_init: sending reset");
+    PS2_MOUSE_SEND(PS2_MOUSE_RESET, "ps2_mouse_init: sending reset");
 
     PS2_MOUSE_RECEIVE("ps2_mouse_init: read BAT");
     PS2_MOUSE_RECEIVE("ps2_mouse_init: read DevID");
@@ -85,8 +81,8 @@ void ps2_mouse_task(void) {
     rcv = ps2_host_send(PS2_MOUSE_READ_DATA);
     if (rcv == PS2_ACK) {
         mouse_report.buttons = ps2_host_recv_response();
-        mouse_report.x       = ps2_host_recv_response() * PS2_MOUSE_X_MULTIPLIER;
-        mouse_report.y       = ps2_host_recv_response() * PS2_MOUSE_Y_MULTIPLIER;
+        mouse_report.x       = ps2_host_recv_response();
+        mouse_report.y       = ps2_host_recv_response();
 #    ifdef PS2_MOUSE_ENABLE_SCROLLING
         mouse_report.v = -(ps2_host_recv_response() & PS2_MOUSE_SCROLL_MASK);
 #    endif
@@ -98,15 +94,14 @@ void ps2_mouse_task(void) {
 #else
     if (pbuf_has_data()) {
         mouse_report.buttons = ps2_host_recv_response();
-        mouse_report.x       = ps2_host_recv_response() * PS2_MOUSE_X_MULTIPLIER;
-        mouse_report.y       = ps2_host_recv_response() * PS2_MOUSE_Y_MULTIPLIER;
+        mouse_report.x       = ps2_host_recv_response();
+        mouse_report.y       = ps2_host_recv_response();
 #    ifdef PS2_MOUSE_ENABLE_SCROLLING
-        mouse_report.v       = -(ps2_host_recv_response() & PS2_MOUSE_SCROLL_MASK);
+        mouse_report.v = -(ps2_host_recv_response() & PS2_MOUSE_SCROLL_MASK);
 #    endif
     } else {
         if (debug_mouse) print("ps2_mouse: fail to get mouse packet\n");
-        /* return here to avoid updating the mouse button state */
-        return;
+        /* do NOT returning here or it would cause #24455 #24599  */
     }
 #endif
 
@@ -121,9 +116,6 @@ void ps2_mouse_task(void) {
         ps2_mouse_convert_report_to_hid(&mouse_report);
 #if PS2_MOUSE_SCROLL_BTN_MASK
         ps2_mouse_scroll_button_task(&mouse_report);
-#endif
-#if PS2_MOUSE_SCROLL_LAYER_MASK
-        ps2_mouse_scroll_layer_task(&mouse_report);
 #endif
         if (mouse_report.x || mouse_report.y || mouse_report.v) {
             ps2_mouse_moved_user(&mouse_report);
@@ -318,27 +310,7 @@ static inline void ps2_mouse_scroll_button_task(report_mouse_t *mouse_report) {
         }
 #endif
         scroll_state = SCROLL_NONE;
-    } else if (scroll_state == SCROLL_NONE) {
-        // Some of the scroll buttons are pressed or released
-        return;
     }
 
     RELEASE_SCROLL_BUTTONS;
-}
-
-static inline void ps2_mouse_scroll_layer_task(report_mouse_t *mouse_report) {
-#if PS2_MOUSE_SCROLL_LAYER_MASK
-    if ((1 << get_highest_layer(layer_state)) & PS2_MOUSE_SCROLL_LAYER_MASK) {
-        mouse_report->v = -mouse_report->y / (PS2_MOUSE_SCROLL_DIVISOR_V);
-        mouse_report->h = mouse_report->x / (PS2_MOUSE_SCROLL_DIVISOR_H);
-        mouse_report->x = 0;
-        mouse_report->y = 0;
-#ifdef PS2_MOUSE_INVERT_H
-        mouse_report->h = -mouse_report->h;
-#endif
-#ifdef PS2_MOUSE_INVERT_V
-        mouse_report->v = -mouse_report->v;
-#endif
-    }
-#endif
 }

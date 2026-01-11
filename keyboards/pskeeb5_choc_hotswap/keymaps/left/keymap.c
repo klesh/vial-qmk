@@ -79,19 +79,18 @@ void keyboard_post_init_user(void) {
 }
 
 #ifdef OLED_ENABLE
-bool oled_task_user(void) {
-    static uint16_t start_timer = 0;
-    if (start_timer == 0) {
-        start_timer = timer_read();
-    }
 
-    oled_set_cursor(0, 0);
+static void render_logo(void) {
+    static const char PROGMEM raw_logo[] = {
+        0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+        0,  0,  0,  0,  0,  0,240,240,128, 64,192,128,  0, 64,224,224, 64,  0, 64,224,224, 64,  0,  0,192,192,128, 64,192,128,  0,  0,128,192, 64, 64, 64,  0,192,192,  0,  0,  0,  0,192, 48,  0,  0,  0,  0,  0,192, 48,  0,  0,  0,192,192,128, 64,192,128,  0,  0,128,192, 64, 64, 64,  0,  0,240,240,  0,  0,128, 64,  0,  0,128,192, 64,192,128,  0,  0,128,192, 64,192,128,  0,  0,240,240,128, 64,192,128,  0,  0,  0,  0, 64,224,224, 64,  0,  0,128,192, 64, 64,192,128,  0,  0,192,192,128, 64,192,128,  0,  0,  0,  0,  0,
+        0,  0,  0,  0,  0,  0, 31, 31,  0,  0, 31, 31,  0,  0, 15, 31, 16, 16,  0, 15, 31, 16, 16,  0,127,127, 16, 16, 31, 15,  0,  0, 17, 19, 23, 30, 12,  0, 24, 24,  0,  0, 96, 30,  1,  0,  0,  0,  0, 96, 30,  1,  0,  0,  0,  0,127,127, 16, 16, 31, 15,  0,  0, 17, 19, 23, 30, 12,  0,  0, 31, 31,  2,  7, 12, 24, 16,  0, 15, 31, 18, 19, 19,  0,  0, 15, 31, 18, 19, 19,  0,  0, 31, 31, 16, 16, 31, 15,  0, 24, 24,  0,  0, 15, 31, 16, 16,  0, 15, 31, 16, 16, 31, 15,  0,  0,127,127, 16, 16, 31, 15,  0,  0,  0,  0,  0,
+        0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+    };
+    oled_write_raw_P(raw_logo, sizeof(raw_logo));
+}
 
-    if (timer_elapsed(start_timer) < 3000) {
-        oled_write_P(PSTR("pskeeb.top"), false);
-        return false;
-    }
-
+static void render_layer(void) {
     oled_write_P(PSTR("Layer: "), false);
     switch (get_highest_layer(layer_state)) {
         case _QW:
@@ -108,6 +107,26 @@ bool oled_task_user(void) {
             break;
         default:
             oled_write_P(PSTR("Undef\n"), false);
+    }
+}
+
+uint16_t startup_timer = 0;
+
+oled_rotation_t oled_init_user(oled_rotation_t rotation) {
+    startup_timer = timer_read();
+    return rotation;
+}
+
+bool oled_task_user(void) {
+    static bool finished_timer = false;
+    if (!finished_timer && (timer_elapsed(startup_timer) < 3000)) {
+        render_logo();
+    } else {
+        if (!finished_timer) {
+            oled_clear();
+            finished_timer = true;
+        }
+        render_layer();
     }
     return false;
 }

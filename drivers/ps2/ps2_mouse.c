@@ -40,6 +40,7 @@ static inline void ps2_mouse_scroll_button_task(report_mouse_t *mouse_report);
 
 /* supports only 3 button mouse at this time */
 void ps2_mouse_init(void) {
+    ps2_host_power_on_reset();
     ps2_host_init();
 
     wait_ms(PS2_MOUSE_INIT_DELAY); // wait for powering up

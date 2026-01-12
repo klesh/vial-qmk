@@ -1,3 +1,1 @@
 SERIAL_DRIVER = vendor
-VIAL_INSECURE = yes
-MOUSEKEY_ENABLE = yes

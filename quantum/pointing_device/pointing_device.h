@@ -74,6 +74,10 @@ typedef struct {
 #    include "i2c_master.h"
 #    include "drivers/sensors/ydx_c09.h"
 #    define POINTING_DEVICE_MOTION_PIN_ACTIVE_LOW
+#elif defined(POINTING_DEVICE_DRIVER_ydx_c02)
+#    include "i2c_master.h"
+#    include "drivers/sensors/ydx_c02.h"
+#    define POINTING_DEVICE_MOTION_PIN_ACTIVE_LOW
 #elif defined(POINTING_DEVICE_DRIVER_pmw3360) || defined(POINTING_DEVICE_DRIVER_pmw3389)
 #    include "spi_master.h"
 #    include "drivers/sensors/pmw33xx_common.h"

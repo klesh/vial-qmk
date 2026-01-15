@@ -22,6 +22,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "host.h"
 #include "report.h"
 
+#if defined(POINTING_DEVICE_CPI_LIST)
+#    include "pointing_device_cpi.h"
+#endif
+
 typedef struct {
     void (*init)(void);
     report_mouse_t (*get_report)(report_mouse_t mouse_report);

@@ -37,14 +37,15 @@ void ydx_c02_set_cpi(uint16_t cpi) {
      * Up/Down:    25 00 06 00 29 42 xx yy  (xx = up, yy = down)
      * Left/Right: 25 00 06 00 29 43 xx yy  (xx = left, yy = right)
      */
-    uint8_t updown[9]   = {0x25, 0x00, 0x06, 0x00, 0x29, 0x42, speed, speed};
-    uint8_t leftright[9] = {0x25, 0x00, 0x06, 0x00, 0x29, 0x43, speed, speed};
+    uint8_t updown[]   = {0x00, 0x06, 0x00, 0x29, 0x42, speed, speed};
+    uint8_t leftright[] = {0x00, 0x06, 0x00, 0x29, 0x43, speed, speed};
 
-    i2c_status_t s1 = i2c_write_register(YDX_C02_ADDRESS << 1, 0x00, updown, sizeof(updown), YDX_C02_TIMEOUT);
-    i2c_status_t s2 = i2c_write_register(YDX_C02_ADDRESS << 1, 0x00, leftright, sizeof(leftright), YDX_C02_TIMEOUT);
+    i2c_status_t s1 = i2c_write_register(YDX_C02_ADDRESS << 1, 0x25, updown, sizeof(updown), YDX_C02_TIMEOUT);
+    wait_ms(10);
+    i2c_status_t s2 = i2c_write_register(YDX_C02_ADDRESS << 1, 0x25, leftright, sizeof(leftright), YDX_C02_TIMEOUT);
 
     #ifdef POINTING_DEVICE_DEBUG
-        printf("ydx_c02 set speed: %d %d\n", s1, s2);
+        printf("ydx_c02 set speed to %d, status: %d %d\n", speed, s1, s2);
     #endif
 }
 

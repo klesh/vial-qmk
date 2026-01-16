@@ -115,6 +115,13 @@ typedef struct _split_slave_pointing_sync_t {
 } split_slave_pointing_sync_t;
 #endif // defined(POINTING_DEVICE_ENABLE) && defined(SPLIT_POINTING_ENABLE)
 
+#if defined(SPLIT_POINTING_DEVICE_CPI_ROLLER_STATE_ENABLE)
+#    include "quantum/pointing_device/pointing_device_cpi_roller_state.h"
+typedef struct _split_slave_cpi_roller_sync_t {
+    uint16_t       cpi;
+} split_slave_cpi_roller_sync_t;
+#endif // defined(SPLIT_POINTING_DEVICE_CPI_ROLLER_STATE_ENABLE)
+
 #if defined(HAPTIC_ENABLE) && defined(SPLIT_HAPTIC_ENABLE)
 #    include "haptic.h"
 typedef struct _split_slave_haptic_sync_t {
@@ -209,6 +216,10 @@ typedef struct _split_shared_memory_t {
 #if defined(POINTING_DEVICE_ENABLE) && defined(SPLIT_POINTING_ENABLE)
     split_slave_pointing_sync_t pointing;
 #endif // defined(POINTING_DEVICE_ENABLE) && defined(SPLIT_POINTING_ENABLE)
+
+#if defined(SPLIT_POINTING_DEVICE_CPI_ROLLER_STATE_ENABLE)
+    split_slave_cpi_roller_sync_t cpi_roller;
+#endif // defined(SPLIT_POINTING_DEVICE_CPI_ROLLER_STATE_ENABLE)
 
 #if defined(SPLIT_WATCHDOG_ENABLE)
     bool watchdog_pinged;

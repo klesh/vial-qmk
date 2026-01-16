@@ -29,6 +29,7 @@ QUANTUM_SRC += \
     $(QUANTUM_DIR)/logging/debug.c \
     $(QUANTUM_DIR)/logging/sendchar.c \
     $(QUANTUM_DIR)/process_keycode/process_default_layer.c \
+    $(QUANTUM_DIR)/pointing_device/pointing_device_cpi_roller_state.c \
 
 include $(QUANTUM_DIR)/nvm/rules.mk
 
@@ -137,6 +138,7 @@ ifeq ($(strip $(POINTING_DEVICE_ENABLE)), yes)
         ifeq ($(strip $(POINTING_DEVICE_CPI_ROLLER)), yes)
 			SRC += $(QUANTUM_DIR)/pointing_device/pointing_device_cpi_roller.c
 			SRC += $(QUANTUM_DIR)/pointing_device/pointing_device_cpi_roller_keycodes.c
+			SRC += $(QUANTUM_DIR)/pointing_device/pointing_device_cpi_roller_state.c
 			OPT_DEFS += -DPOINTING_DEVICE_CPI_ROLLER
 		endif
         ifneq ($(strip $(POINTING_DEVICE_DRIVER)), custom)

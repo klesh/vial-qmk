@@ -358,6 +358,9 @@ There are a few different ways to set handedness for split keyboards (listed in 
 * `#define SPLIT_TRANSACTION_IDS_USER .....`
   * Allows for custom data sync with the slave when using the QMK-provided split transport. See [custom data sync between sides](features/split_keyboard#custom-data-sync) for more information.
 
+* `#define SPLIT_POINTING_DEVICE_CPI_ROLLER_STATE_ENABLE`
+  * Ensures the current pointing evice cpi value is available on the slave when using the QMK-provided split transport.
+
 # The `rules.mk` File
 
 This is a [make](https://www.gnu.org/software/make/manual/make.html) file that is included by the top-level `Makefile`. It is used to set some information about the MCU that we will be compiling for as well as enabling and disabling certain features.

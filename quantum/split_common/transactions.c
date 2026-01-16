@@ -58,6 +58,9 @@
 #ifdef POINTING_DEVICE_ENABLE
 #    include "pointing_device.h"
 #endif
+#ifdef SPLIT_POINTING_DEVICE_CPI_ROLLER_STATE_ENABLE
+#    include "quantum/pointing_device/pointing_device_cpi_roller_state.h"
+#endif
 #ifdef OS_DETECTION_ENABLE
 #    include "os_detection.h"
 #endif
@@ -786,6 +789,60 @@ static void pointing_handlers_slave(matrix_row_t master_matrix[], matrix_row_t s
 #endif // defined(POINTING_DEVICE_ENABLE) && defined(SPLIT_POINTING_ENABLE)
 
 ////////////////////////////////////////////////////
+// CPI Roller
+
+#if defined(SPLIT_POINTING_DEVICE_CPI_ROLLER_STATE_ENABLE)
+
+static bool cpi_roller_handlers_master(matrix_row_t master_matrix[], matrix_row_t slave_matrix[]) {
+    static uint32_t last_cpi_update = 0;
+    static uint16_t last_cpi        = 0;
+    bool            okay            = false;
+    uint16_t        temp_cpi;
+    temp_cpi = pointing_device_cpi_roller_current_value();
+    if (temp_cpi) {
+        split_shmem->cpi_roller.cpi = temp_cpi;
+        okay                        = send_if_condition(PUT_CPI_ROLLER_STATE, &last_cpi_update, last_cpi != temp_cpi, &split_shmem->cpi_roller.cpi, sizeof(split_shmem->cpi_roller.cpi));
+        if (okay) {
+            last_cpi = temp_cpi;
+        }
+    }
+    return okay;
+}
+
+static void cpi_roller_handlers_slave(matrix_row_t master_matrix[], matrix_row_t slave_matrix[]) {
+#    if (POINTING_DEVICE_TASK_THROTTLE_MS > 0)
+    static uint32_t last_exec = 0;
+    if (timer_elapsed32(last_exec) < POINTING_DEVICE_TASK_THROTTLE_MS) {
+        return;
+    }
+    last_exec = timer_read32();
+#    endif
+
+    uint16_t temp_cpi = pointing_device_cpi_roller_current_value();
+
+    split_shared_memory_lock();
+    split_slave_cpi_roller_sync_t cpi_roller;
+    memcpy(&cpi_roller, &split_shmem->cpi_roller, sizeof(split_slave_cpi_roller_sync_t));
+    split_shared_memory_unlock();
+
+    if (cpi_roller.cpi && cpi_roller.cpi != temp_cpi) {
+        pointing_device_cpi_roller_set_value(cpi_roller.cpi);
+    }
+}
+
+#    define TRANSACTIONS_CPI_ROLLER_MASTER() TRANSACTION_HANDLER_MASTER(cpi_roller)
+#    define TRANSACTIONS_CPI_ROLLER_SLAVE() TRANSACTION_HANDLER_SLAVE(cpi_roller)
+#    define TRANSACTIONS_CPI_ROLLER_REGISTRATIONS [PUT_CPI_ROLLER_STATE] = trans_initiator2target_initializer(cpi_roller.cpi),
+
+#else // defined(SPLIT_POINTING_DEVICE_CPI_ROLLER_STATE_ENABLE)
+
+#    define TRANSACTIONS_CPI_ROLLER_MASTER()
+#    define TRANSACTIONS_CPI_ROLLER_SLAVE()
+#    define TRANSACTIONS_CPI_ROLLER_REGISTRATIONS
+
+#endif // defined(SPLIT_POINTING_DEVICE_CPI_ROLLER_STATE_ENABLE)
+
+////////////////////////////////////////////////////
 // WATCHDOG
 
 #if defined(SPLIT_WATCHDOG_ENABLE)
@@ -940,6 +997,7 @@ split_transaction_desc_t split_transaction_table[NUM_TOTAL_TRANSACTIONS] = {
     TRANSACTIONS_OLED_REGISTRATIONS
     TRANSACTIONS_ST7565_REGISTRATIONS
     TRANSACTIONS_POINTING_REGISTRATIONS
+    TRANSACTIONS_CPI_ROLLER_REGISTRATIONS
     TRANSACTIONS_WATCHDOG_REGISTRATIONS
     TRANSACTIONS_HAPTIC_REGISTRATIONS
     TRANSACTIONS_ACTIVITY_REGISTRATIONS
@@ -970,6 +1028,7 @@ bool transactions_master(matrix_row_t master_matrix[], matrix_row_t slave_matrix
     TRANSACTIONS_OLED_MASTER();
     TRANSACTIONS_ST7565_MASTER();
     TRANSACTIONS_POINTING_MASTER();
+    TRANSACTIONS_CPI_ROLLER_MASTER();
     TRANSACTIONS_WATCHDOG_MASTER();
     TRANSACTIONS_HAPTIC_MASTER();
     TRANSACTIONS_ACTIVITY_MASTER();
@@ -993,6 +1052,7 @@ void transactions_slave(matrix_row_t master_matrix[], matrix_row_t slave_matrix[
     TRANSACTIONS_OLED_SLAVE();
     TRANSACTIONS_ST7565_SLAVE();
     TRANSACTIONS_POINTING_SLAVE();
+    TRANSACTIONS_CPI_ROLLER_SLAVE();
     TRANSACTIONS_WATCHDOG_SLAVE();
     TRANSACTIONS_HAPTIC_SLAVE();
     TRANSACTIONS_ACTIVITY_SLAVE();

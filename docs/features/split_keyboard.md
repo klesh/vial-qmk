@@ -322,6 +322,13 @@ This enables the triggering of haptic feedback on the slave side of the split ke
 
 This synchronizes the activity timestamps between sides of the split keyboard, allowing for activity timeouts to occur.
 
+
+```c
+#define SPLIT_POINTING_DEVICE_CPI_ROLLER_STATE_ENABLE
+```
+
+This enables syncing of the cpi roller state between both halves of the split keyboard. The main purpose of this feature is to enable support for use of things like OLED display of the currently cpi value.
+
 ### Custom data sync between sides {#custom-data-sync}
 
 QMK's split transport allows for arbitrary data transactions at both the keyboard and user levels. This is modelled on a remote procedure call, with the master invoking a function on the slave side, with the ability to send data from master to slave, process it slave side, and send data back from slave to master.

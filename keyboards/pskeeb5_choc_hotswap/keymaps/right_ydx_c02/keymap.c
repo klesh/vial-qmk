@@ -86,14 +86,15 @@ static bool scrolling_mode = false;
 
 layer_state_t layer_state_set_user(layer_state_t state) {
     switch (get_highest_layer(state)) {
-        case _SC:  // If we're on the _RAISE layer enable scrolling mode
+        case _SC:
             scrolling_mode = true;
-            // pointing_device_set_cpi(2000);
+            pointing_device_set_cpi(POINTING_DEVICE_SCROLLING_CPI);
             break;
         default:
-            if (scrolling_mode) {  // check if we were scrolling before and set disable if so
+            if (scrolling_mode) {
                 scrolling_mode = false;
-                // pointing_device_set_cpi(8000);
+                // restore
+                pointing_device_cpi_roller_set_index(pointing_device_cpi_roller_current_index());
             }
             break;
     }

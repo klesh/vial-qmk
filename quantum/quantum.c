@@ -69,8 +69,8 @@
 #    include "process_underglow.h"
 #endif
 
-#if defined(POINTING_DEVICE_CPI_LIST)
-#    include "pointing_device/pointing_device_vial_keycodes.h"
+#if defined(POINTING_DEVICE_CPI_ROLLER)
+#    include "pointing_device/pointing_device_cpi_roller_keycodes.h"
 #endif
 
 #ifdef SECURE_ENABLE
@@ -429,8 +429,8 @@ bool process_record_quantum_helper(uint16_t keycode, keyrecord_t *record) {
 #if defined(RGBLIGHT_ENABLE) || defined(RGB_MATRIX_ENABLE)
             process_underglow(keycode, record) &&
 #endif
-#if defined(POINTING_DEVICE_CPI_LIST)
-            process_pointing_device_cpi(keycode, record) &&
+#if defined(POINTING_DEVICE_CPI_ROLLER)
+            process_pointing_device_cpi_roller(keycode, record) &&
 #endif
 #if defined(RGB_MATRIX_ENABLE)
             process_rgb_matrix(keycode, record) &&

@@ -18,7 +18,7 @@
 #pragma once
 
 #include "quantum_keycodes.h"
-#include "pointing_device_cpi.h"
+#include "pointing_device_cpi_roller.h"
 #include "action.h"
 
 /* Define a compact set of CPI-related keycodes starting at SAFE_RANGE.
@@ -27,15 +27,13 @@
  * collide with other custom keycodes in a keymap; include this header
  * early in the keymap to reserve the enum values.
  */
-enum pointing_device_vial_keycodes {
+enum pointing_device_keycodes {
     PD_CPI_PREV = SAFE_RANGE,
     PD_CPI_NEXT,
     PD_CPI_SET_0, PD_CPI_SET_1, PD_CPI_SET_2, PD_CPI_SET_3, PD_CPI_SET_4,
     PD_CPI_SET_5, PD_CPI_SET_6, PD_CPI_SET_7, PD_CPI_SET_8, PD_CPI_SET_9,
 };
 
-/* Process key event: returns true if the keycode was handled here and the
- * caller should stop further processing (i.e. return false from
- * `process_record_user`).
+/* Process key event
  */
-bool process_pointing_device_cpi(uint16_t keycode, keyrecord_t *record);
+bool process_pointing_device_cpi_roller(uint16_t keycode, keyrecord_t *record);

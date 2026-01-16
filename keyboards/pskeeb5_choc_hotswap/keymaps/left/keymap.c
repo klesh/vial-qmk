@@ -3,6 +3,7 @@
 
 #include QMK_KEYBOARD_H
 #include "quantum/qmk_settings.h"
+#include "quantum/pointing_device/pointing_device_cpi_roller_state.h"
 
 // Defines names for use in layer keycodes and the keymap
 enum layer_names {
@@ -108,6 +109,10 @@ static void render_layer(void) {
         default:
             oled_write_P(PSTR("Undef\n"), false);
     }
+    char cpi[10];
+    sprintf(cpi, "%d", pointing_device_cpi_roller_current_value());
+    oled_write_P(PSTR("Speed: "), false);
+    oled_write_ln_P(cpi, false);
 }
 
 uint16_t startup_timer = 0;

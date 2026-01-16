@@ -4,6 +4,8 @@
 #include "print.h"
 #include QMK_KEYBOARD_H
 #include "quantum/qmk_settings.h"
+#include "quantum/pointing_device/pointing_device_cpi_roller_keycodes.h"
+
 
 // Defines names for use in layer keycodes and the keymap
 enum layer_names {
@@ -42,7 +44,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_SC] = LAYOUT_split_3x5_4(
   LALT(KC_F4),  _______, KC_END,  _______,       KC_TAB ,            KC_WBAK, LCTL(KC_PGUP), LCTL(KC_PGDN), KC_WFWD, KC_MPRV,
   KC_HOME,      KC_BSPC, KC_DEL,  LCTL(KC_RGHT), _______,            KC_LEFT, KC_DOWN,       KC_UP,         KC_RGHT, _______,
-  KC_WH_L,      KC_WH_R, KC_CAPS, _______,       LCTL(KC_LEFT),      KC_MNXT, _______,       KC_WH_U,       KC_WH_D,  KC_MPLY,
+  PD_CPI_PREV, PD_CPI_NEXT, LGUI(KC_C), LGUI(KC_V),       LCTL(KC_LEFT),      KC_MNXT, _______,       KC_WH_U,       KC_WH_D,  KC_MPLY,
                 _______, _______, _______, _______,                  KC_BTN3, KC_BTN2, _______, _______
 ),
 
@@ -61,8 +63,8 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
 void keyboard_post_init_user(void) {
     debug_enable=true;
     // debug_mouse=true;
-    debug_keyboard=true;
-    debug_matrix=true;
+    // debug_keyboard=true;
+    // debug_matrix=true;
     vial_combo_entry_t tab = {
       {KC_E, KC_R, KC_NO, KC_NO},
       KC_TAB,
@@ -77,4 +79,33 @@ void keyboard_post_init_user(void) {
     char taphold_ignore_mod_tap_interrupt= 1 << 1;
     char taphold_qsid_8 = taphold_permissive_hold | taphold_ignore_mod_tap_interrupt;
     qmk_settings_set(8, &taphold_qsid_8, sizeof(taphold_qsid_8));
+}
+
+
+static bool scrolling_mode = false;
+
+layer_state_t layer_state_set_user(layer_state_t state) {
+    switch (get_highest_layer(state)) {
+        case _SC:  // If we're on the _RAISE layer enable scrolling mode
+            scrolling_mode = true;
+            // pointing_device_set_cpi(2000);
+            break;
+        default:
+            if (scrolling_mode) {  // check if we were scrolling before and set disable if so
+                scrolling_mode = false;
+                // pointing_device_set_cpi(8000);
+            }
+            break;
+    }
+    return state;
+}
+
+report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
+    if (scrolling_mode) {
+        mouse_report.h = mouse_report.x;
+        mouse_report.v = mouse_report.y;
+        mouse_report.x = 0;
+        mouse_report.y = 0;
+    }
+    return mouse_report;
 }

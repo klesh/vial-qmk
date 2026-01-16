@@ -134,10 +134,10 @@ ifeq ($(strip $(POINTING_DEVICE_ENABLE)), yes)
         SRC += $(QUANTUM_DIR)/pointing_device/pointing_device.c
         SRC += $(QUANTUM_DIR)/pointing_device/pointing_device_auto_mouse.c
         # Compile CPI helper and Vial keycodes when a CPI list is provided
-        ifneq ($(strip $(POINTING_DEVICE_CPI_LIST)), )
-			SRC += $(QUANTUM_DIR)/pointing_device/pointing_device_cpi.c
-			SRC += $(QUANTUM_DIR)/pointing_device/pointing_device_vial_keycodes.c
-			OPT_DEFS += -DPOINTING_DEVICE_CPI
+        ifeq ($(strip $(POINTING_DEVICE_CPI_ROLLER)), yes)
+			SRC += $(QUANTUM_DIR)/pointing_device/pointing_device_cpi_roller.c
+			SRC += $(QUANTUM_DIR)/pointing_device/pointing_device_cpi_roller_keycodes.c
+			OPT_DEFS += -DPOINTING_DEVICE_CPI_ROLLER
 		endif
         ifneq ($(strip $(POINTING_DEVICE_DRIVER)), custom)
             SRC += drivers/sensors/$(strip $(POINTING_DEVICE_DRIVER)).c

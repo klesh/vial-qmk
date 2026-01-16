@@ -5,9 +5,10 @@
 
 #define MASTER_RIGHT
 
+// Encoder configuation
+#define ENCODER_DIRECTION_FLIP
 
-// #define VIAL_UNLOCK_COMBO_ROWS { 0, 4 }
-// #define VIAL_UNLOCK_COMBO_COLS { 4, 4 }
-
-#define SPLIT_LAYER_STATE_ENABLE
+// Sync state for oled on the slave havle
 #define SPLIT_TRANSPORT_MIRROR
+#define SPLIT_LAYER_STATE_ENABLE
+#define SPLIT_POINTING_DEVICE_CPI_ROLLER_STATE_ENABLE

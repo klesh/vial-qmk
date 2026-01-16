@@ -11,7 +11,7 @@ static uint16_t pointing_device_cpi_list[] = POINTING_DEVICE_CPI_ROLLER_LIST;
 static uint16_t pointing_device_cpi_list[10] = {0};
 #endif
 static uint8_t  pointing_device_cpi_list_len = sizeof(pointing_device_cpi_list) / sizeof(pointing_device_cpi_list[0]);
-static uint8_t selected_cpi_index = 0;
+static int8_t selected_cpi_index = 0;
 
 void pointing_device_cpi_roller_init(void) {
     if (pointing_device_cpi_list_len == 0) {
@@ -42,11 +42,11 @@ void pointing_device_cpi_roller_set_index(uint8_t idx) {
 }
 
 void pointing_device_cpi_roller_next(void) {
-    pointing_device_cpi_roller_set_index((selected_cpi_index + 1) % (uint8_t)pointing_device_cpi_list_len);
+    pointing_device_cpi_roller_set_index((selected_cpi_index + 1) % pointing_device_cpi_list_len);
 }
 
 void pointing_device_cpi_roller_prev(void) {
-    pointing_device_cpi_roller_set_index((selected_cpi_index - 1) % (uint8_t)pointing_device_cpi_list_len);
+    pointing_device_cpi_roller_set_index((selected_cpi_index - 1 + pointing_device_cpi_list_len) % pointing_device_cpi_list_len);
 }
 
 void pointing_device_cpi_roller_set_list(uint16_t* cpi_list, uint8_t cpi_count) {

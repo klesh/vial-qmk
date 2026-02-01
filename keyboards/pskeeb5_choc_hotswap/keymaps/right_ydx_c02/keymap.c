@@ -88,13 +88,13 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     switch (get_highest_layer(state)) {
         case _SC:
             scrolling_mode = true;
-            pointing_device_set_cpi(POINTING_DEVICE_SCROLLING_CPI);
+            // pointing_device_set_cpi(POINTING_DEVICE_SCROLLING_CPI);
             break;
         default:
             if (scrolling_mode) {
                 scrolling_mode = false;
                 // restore
-                pointing_device_cpi_roller_set_index(pointing_device_cpi_roller_current_index());
+                // pointing_device_cpi_roller_set_index(pointing_device_cpi_roller_current_index());
             }
             break;
     }
@@ -103,8 +103,8 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 
 report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
     if (scrolling_mode) {
-        mouse_report.h = mouse_report.x;
-        mouse_report.v = mouse_report.y;
+        mouse_report.h = mouse_report.x / 2;
+        mouse_report.v = mouse_report.y / 2;
         mouse_report.x = 0;
         mouse_report.y = 0;
     }

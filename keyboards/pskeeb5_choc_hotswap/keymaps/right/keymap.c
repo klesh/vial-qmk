@@ -17,7 +17,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   KC_Q,         KC_W,         KC_E,         KC_R,         KC_T,              KC_Y,    KC_U,         KC_I,         KC_O,         KC_P,
   LALT_T(KC_A), LSFT_T(KC_S), LGUI_T(KC_D), LCTL_T(KC_F), LT(_SC, KC_G),     LT(_SC, KC_H),    RCTL_T(KC_J), RGUI_T(KC_K), RSFT_T(KC_L), RALT_T(KC_SCLN),
   LCTL_T(KC_Z), KC_X,         KC_C,         KC_V,         KC_B,              KC_N,    KC_M,         KC_COMM,      KC_DOT,       LCTL_T(KC_SLSH),
-                  KC_SLEP, LT(_LO, KC_ENT), LT(_SC, KC_ESC), KC_BTN2,      KC_BTN1, LT(_RA, KC_BSPC), RSFT_T(KC_SPC),  KC_MPLY
+                  KC_SLEP, LT(_LO, KC_ENT), LT(_SC, KC_ESC), KC_BTN1,      KC_BTN2, LT(_RA, KC_BSPC), RSFT_T(KC_SPC),  KC_MPLY
 ),
 
 
@@ -33,7 +33,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_RA] = LAYOUT_split_3x5_4(
   KC_QUOT, KC_DQUO, KC_EXLM, KC_ASTR, KC_TILD,      KC_WH_U, KC_UNDS, _______, KC_GRV,  KC_PIPE,
   KC_AT,   KC_HASH, KC_DLR,  KC_LPRN, KC_RPRN,      KC_WH_D, KC_LBRC, KC_RBRC, KC_LCBR, KC_RCBR,
-  _______, KC_PERC, _______, KC_CIRC, KC_BSLS,      KC_AMPR, _______, KC_PGUP, KC_PGDN, _______,
+  _______, KC_PERC, KC_CAPS, KC_CIRC, KC_BSLS,      KC_AMPR, _______, KC_PGUP, KC_PGDN, _______,
            _______, _______, _______, _______,      _______, _______, _______, _______
 ),
 
@@ -41,7 +41,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_SC] = LAYOUT_split_3x5_4(
   LALT(KC_F4),  _______, KC_END,  _______,       KC_TAB ,            KC_WBAK, LCTL(KC_PGUP), LCTL(KC_PGDN), KC_WFWD, KC_MPRV,
   KC_HOME,      KC_BSPC, KC_DEL,  LCTL(KC_RGHT), _______,            KC_LEFT, KC_DOWN,       KC_UP,         KC_RGHT, _______,
-  KC_WH_L,      KC_WH_R, KC_CAPS, _______,       LCTL(KC_LEFT),      KC_MNXT, _______,       KC_WH_U,       KC_WH_D,  KC_MPLY,
+  KC_WH_L,      KC_WH_R, LCTL(KC_INS), LSFT(KC_INS),       LCTL(KC_LEFT),      KC_MNXT, _______,       KC_WH_U,       KC_WH_D,  KC_MPLY,
                 _______, _______, _______, _______,                  KC_BTN3, KC_BTN2, _______, _______
 ),
 
@@ -49,10 +49,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 #if defined(ENCODER_MAP_ENABLE)
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
-    [_QW] = {ENCODER_CCW_CW(KC_VOLD, KC_VOLU), ENCODER_CCW_CW(KC_LEFT, KC_RIGHT)},
-    [_LO] = {ENCODER_CCW_CW(KC_VOLD, KC_VOLU), ENCODER_CCW_CW(KC_LEFT, KC_RIGHT)},
-    [_RA] = {ENCODER_CCW_CW(KC_VOLD, KC_VOLU), ENCODER_CCW_CW(KC_LEFT, KC_RIGHT)},
-    [_SC] = {ENCODER_CCW_CW(KC_VOLD, KC_VOLU), ENCODER_CCW_CW(KC_LEFT, KC_RIGHT)},
+    [_QW] = {ENCODER_CCW_CW(KC_VOLU, KC_VOLD), ENCODER_CCW_CW(KC_RIGHT, KC_LEFT)},
+    [_LO] = {ENCODER_CCW_CW(KC_VOLU, KC_VOLD), ENCODER_CCW_CW(KC_RIGHT, KC_LEFT)},
+    [_RA] = {ENCODER_CCW_CW(KC_VOLU, KC_VOLD), ENCODER_CCW_CW(KC_RIGHT, KC_LEFT)},
+    [_SC] = {ENCODER_CCW_CW(KC_VOLU, KC_VOLD), ENCODER_CCW_CW(KC_RIGHT, KC_LEFT)},
 };
 #endif
 

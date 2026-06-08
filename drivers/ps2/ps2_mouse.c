@@ -16,6 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <stdbool.h>
+#include <stdlib.h>
 #include "ps2_mouse.h"
 #include "wait.h"
 #include "gpio.h"
@@ -324,10 +325,20 @@ static inline void ps2_mouse_scroll_button_task(report_mouse_t *mouse_report) {
     RELEASE_SCROLL_BUTTONS;
 }
 
+int16_t apply_smooth_curve(int16_t input) {
+    int sign = (input > 0) ? 1 : -1;
+    int16_t abs_input = abs(input);
+
+
+    float smooth_output = (0.2f * abs_input) + (0.0005f * abs_input * abs_input);
+
+    return (int16_t)(smooth_output * sign);
+}
+
 static inline void ps2_mouse_scroll_layer_task(report_mouse_t *mouse_report) {
     if ((1 << get_highest_layer(layer_state)) & PS2_MOUSE_SCROLL_LAYER_MASK) {
-        mouse_report->v = -mouse_report->y / (PS2_MOUSE_SCROLL_DIVISOR_V);
-        mouse_report->h = mouse_report->x / (PS2_MOUSE_SCROLL_DIVISOR_H);
+        mouse_report->v = apply_smooth_curve(-mouse_report->y);
+        mouse_report->h = apply_smooth_curve(mouse_report->x);
         mouse_report->x = 0;
         mouse_report->y = 0;
 #ifdef PS2_MOUSE_INVERT_H

@@ -57,11 +57,24 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
 #endif
 
 
+typedef union {
+    uint32_t raw;
+    struct {
+        bool initialized : 1;
+    };
+} user_eeprom_t;
+
 void keyboard_post_init_user(void) {
-    debug_enable=true;
+    // debug_enable=true;
     // debug_mouse=true;
-    debug_keyboard=true;
-    debug_matrix=true;
+    // debug_keyboard=true;
+    // debug_matrix=true;
+    user_eeprom_t user_eeprom;
+    user_eeprom.raw = eeconfig_read_user();
+    if (user_eeprom.initialized) {
+        return;
+    }
+
     vial_combo_entry_t tab = {
       {KC_E, KC_R, KC_NO, KC_NO},
       KC_TAB,
@@ -72,8 +85,15 @@ void keyboard_post_init_user(void) {
       KC_BTN3,
     };
     dynamic_keymap_set_combo(1, &btn3);
+    // enable permission hold
     char taphold_permissive_hold = 1 << 0;
     char taphold_ignore_mod_tap_interrupt= 1 << 1;
     char taphold_qsid_8 = taphold_permissive_hold | taphold_ignore_mod_tap_interrupt;
     qmk_settings_set(8, &taphold_qsid_8, sizeof(taphold_qsid_8));
+    // add delay between key up/down events when tap is triggered for hold-tap keys
+    uint16_t tap_code_delay = 20;
+    qmk_settings_set(18, &tap_code_delay, sizeof(tap_code_delay));
+
+    user_eeprom.initialized = true;
+    eeconfig_update_user(user_eeprom.raw);
 }

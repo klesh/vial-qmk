@@ -45,6 +45,17 @@
         "soft_serial_pin": "GP14",
         "transport": {
             "protocol": "serial"
+        },
+        "encoder": {
+            "right": {
+                "rotary": [
+                    {
+                        "pin_a": "GP29",
+                        "pin_b": "GP28",
+                        "resolution": 2
+                    }
+                ]
+            }
         }
     },
     "encoder": {

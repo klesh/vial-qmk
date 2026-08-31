@@ -7,6 +7,10 @@
         "rows": 8,
         "cols": 5
     },
+    "customKeycodes": [
+        { "name": "TP Sens Down", "title": "TrackPoint sensitivity -10", "shortName": "TPS-" },
+        { "name": "TP Sens Up",   "title": "TrackPoint sensitivity +10", "shortName": "TPS+" }
+    ],
     "layouts": {
         "keymap": [
             [

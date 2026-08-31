@@ -14,7 +14,7 @@ enum layer_names {
 };
 
 enum custom_keycodes {
-    TP_SENS_DOWN = SAFE_RANGE,
+    TP_SENS_DOWN = QK_KB_0,
     TP_SENS_UP,
 };
 

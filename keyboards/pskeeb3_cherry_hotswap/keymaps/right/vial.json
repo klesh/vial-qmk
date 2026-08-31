@@ -1,6 +1,5 @@
 {
     "name": "pskeeb3 cherry hotswap",
-    "lighting": "vialrgb",
     "vendorId": "0xFEED",
     "productId": "0x8103",
     "matrix": {

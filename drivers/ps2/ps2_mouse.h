@@ -175,3 +175,80 @@ void ps2_mouse_set_resolution(ps2_mouse_resolution_t resolution);
 void ps2_mouse_set_sample_rate(ps2_mouse_sample_rate_t sample_rate);
 
 void ps2_mouse_moved_user(report_mouse_t *mouse_report);
+
+/* ============================= TRACKPOINT ============================ */
+/*
+ * TrackPoint-specific commands as defined in the "IBM TrackPoint System
+ * Version 4.0 Engineering Specification" (YKT3Eext.pdf).
+ *
+ * The TrackPoint extends the standard PS/2 mouse command set with the
+ * 0xE2 command prefix, followed by a sub-command byte and an optional
+ * argument byte:
+ *   0xE2 0x80 <sub>  -> read a setting
+ *   0xE2 0x81 <sub>  -> write a setting (next byte is the value)
+ *
+ * The commands below cover the most commonly adjusted TrackPoint
+ * parameters. See the spec for the full list and behaviour.
+ */
+
+#define PS2_MOUSE_TP_CMD_PREFIX 0xE2
+
+/* Sub-command bytes (the 3rd byte of the 0xE2 0x80/0x81 sequence). */
+#define PS2_MOUSE_TP_SUB_SENSITIVITY 0x4A
+#define PS2_MOUSE_TP_SUB_NEG_INERTIA 0x4D
+#define PS2_MOUSE_TP_SUB_PTS_THRESHOLD 0x5C
+#define PS2_MOUSE_TP_SUB_VALUE6_UPPER_PLATEAU_SPEED 0x60
+
+/* Argument ranges and defaults. */
+#define PS2_MOUSE_TP_SENSITIVITY_MIN 0
+#define PS2_MOUSE_TP_SENSITIVITY_MAX 255
+#define PS2_MOUSE_TP_SENSITIVITY_DEFAULT 128
+
+#define PS2_MOUSE_TP_NEG_INERTIA_MIN 0
+#define PS2_MOUSE_TP_NEG_INERTIA_MAX 255
+#define PS2_MOUSE_TP_NEG_INERTIA_DEFAULT 0x06
+
+#define PS2_MOUSE_TP_VALUE6_UPPER_PLATEAU_SPEED_MIN 0
+#define PS2_MOUSE_TP_VALUE6_UPPER_PLATEAU_SPEED_MAX 255
+#define PS2_MOUSE_TP_VALUE6_UPPER_PLATEAU_SPEED_DEFAULT 0x61
+
+#define PS2_MOUSE_TP_PTS_THRESHOLD_MIN 0
+#define PS2_MOUSE_TP_PTS_THRESHOLD_MAX 255
+#define PS2_MOUSE_TP_PTS_THRESHOLD_DEFAULT 0x08
+
+/*
+ * Read the current value of a TrackPoint setting.
+ * Returns 0 on success and stores the value in *value, or a non-zero
+ * error code on failure. The functions are no-ops (return 0 with no
+ * side effects) when the device is not a TrackPoint, i.e. when the
+ * 0xE2 command is not acknowledged.
+ */
+uint8_t ps2_mouse_tp_sensitivity_get(uint8_t *value);
+uint8_t ps2_mouse_tp_neg_inertia_get(uint8_t *value);
+uint8_t ps2_mouse_tp_value6_upper_plateau_speed_get(uint8_t *value);
+uint8_t ps2_mouse_tp_pts_threshold_get(uint8_t *value);
+
+/*
+ * Set a TrackPoint setting to an absolute value.
+ * Returns 0 on success or a non-zero error code on failure.
+ */
+uint8_t ps2_mouse_tp_sensitivity_set(uint8_t value);
+uint8_t ps2_mouse_tp_neg_inertia_set(uint8_t value);
+uint8_t ps2_mouse_tp_value6_upper_plateau_speed_set(uint8_t value);
+uint8_t ps2_mouse_tp_pts_threshold_set(uint8_t value);
+
+/*
+ * Adjust a TrackPoint setting by a signed delta, clamping to the
+ * supported range. The new value is stored internally so that the
+ * get/change functions keep working without re-reading from the
+ * device.
+ */
+uint8_t ps2_mouse_tp_sensitivity_change(int8_t delta);
+uint8_t ps2_mouse_tp_neg_inertia_change(int8_t delta);
+uint8_t ps2_mouse_tp_value6_upper_plateau_speed_change(int8_t delta);
+uint8_t ps2_mouse_tp_pts_threshold_change(int8_t delta);
+
+/*
+ * Restore all TrackPoint settings to their factory defaults.
+ */
+void ps2_mouse_tp_settings_reset(void);

@@ -325,6 +325,190 @@ static inline void ps2_mouse_scroll_button_task(report_mouse_t *mouse_report) {
     RELEASE_SCROLL_BUTTONS;
 }
 
+/* ============================= TRACKPOINT ============================ */
+/*
+ * TrackPoint-specific helpers.
+ *
+ * TrackPoints extend the standard PS/2 mouse command set with the
+ * 0xE2 command prefix. A read is `0xE2 0x80 <sub>` followed by one
+ * response byte, and a write is `0xE2 0x81 <sub> <value>`. The
+ * functions below wrap those sequences so that keymaps can adjust
+ * TrackPoint settings at run-time.
+ *
+ * All functions are guarded so that calling them on a non-TrackPoint
+ * device is a no-op (returns a non-zero error) rather than corrupting
+ * mouse state. The 0xE2 prefix is only honoured by TrackPoints; a
+ * plain PS/2 mouse will NAK or ignore it.
+ *
+ * Values are cached internally so that the change/get helpers keep
+ * working without re-reading from the device.
+ */
+
+static uint8_t tp_sensitivity   = PS2_MOUSE_TP_SENSITIVITY_DEFAULT;
+static uint8_t tp_neg_inertia   = PS2_MOUSE_TP_NEG_INERTIA_DEFAULT;
+static uint8_t tp_value6        = PS2_MOUSE_TP_VALUE6_UPPER_PLATEAU_SPEED_DEFAULT;
+static uint8_t tp_pts_threshold = PS2_MOUSE_TP_PTS_THRESHOLD_DEFAULT;
+
+/* Send a 0xE2 0x80 <sub> read sequence and return the response byte.
+ * On failure returns 0 and sets *err to a non-zero value. */
+static uint8_t ps2_mouse_tp_read(uint8_t sub, uint8_t *err) {
+    uint8_t ack;
+    uint8_t value = 0;
+
+    if (PS2_MOUSE_STREAM_MODE == ps2_mouse_mode) {
+        ps2_mouse_disable_data_reporting();
+    }
+
+    ack = ps2_host_send(PS2_MOUSE_TP_CMD_PREFIX);
+    if (ack != PS2_ACK) {
+        *err = 1;
+        goto done;
+    }
+    ps2_host_send(0x80);
+    ps2_host_send(sub);
+    value = ps2_host_recv_response();
+    *err = 0;
+
+done:
+    if (PS2_MOUSE_STREAM_MODE == ps2_mouse_mode) {
+        ps2_mouse_enable_data_reporting();
+    }
+    return value;
+}
+
+/* Send a 0xE2 0x81 <sub> <value> write sequence.
+ * Returns 0 on success or a non-zero error code on failure. */
+static uint8_t ps2_mouse_tp_write(uint8_t sub, uint8_t value) {
+    uint8_t ack;
+    uint8_t err = 0;
+
+    if (PS2_MOUSE_STREAM_MODE == ps2_mouse_mode) {
+        ps2_mouse_disable_data_reporting();
+    }
+
+    ack = ps2_host_send(PS2_MOUSE_TP_CMD_PREFIX);
+    if (ack != PS2_ACK) {
+        err = 1;
+        goto done;
+    }
+    ps2_host_send(0x81);
+    ps2_host_send(sub);
+    ack = ps2_host_send(value);
+    if (ack != PS2_ACK) {
+        err = 2;
+        goto done;
+    }
+
+done:
+    if (PS2_MOUSE_STREAM_MODE == ps2_mouse_mode) {
+        ps2_mouse_enable_data_reporting();
+    }
+    return err;
+}
+
+uint8_t ps2_mouse_tp_sensitivity_get(uint8_t *value) {
+    uint8_t err;
+    uint8_t v = ps2_mouse_tp_read(PS2_MOUSE_TP_SUB_SENSITIVITY, &err);
+    if (err) return err;
+    *value = v;
+    tp_sensitivity = v;
+    return 0;
+}
+
+uint8_t ps2_mouse_tp_sensitivity_set(uint8_t value) {
+    uint8_t err = ps2_mouse_tp_write(PS2_MOUSE_TP_SUB_SENSITIVITY, value);
+    if (err) return err;
+    tp_sensitivity = value;
+    if (debug_mouse) xprintf("ps2_mouse: TP sensitivity set to %d\n", value);
+    return 0;
+}
+
+uint8_t ps2_mouse_tp_sensitivity_change(int8_t delta) {
+    int new_val = (int)tp_sensitivity + delta;
+    if (new_val < PS2_MOUSE_TP_SENSITIVITY_MIN) new_val = PS2_MOUSE_TP_SENSITIVITY_MIN;
+    if (new_val > PS2_MOUSE_TP_SENSITIVITY_MAX) new_val = PS2_MOUSE_TP_SENSITIVITY_MAX;
+    return ps2_mouse_tp_sensitivity_set((uint8_t)new_val);
+}
+
+uint8_t ps2_mouse_tp_neg_inertia_get(uint8_t *value) {
+    uint8_t err;
+    uint8_t v = ps2_mouse_tp_read(PS2_MOUSE_TP_SUB_NEG_INERTIA, &err);
+    if (err) return err;
+    *value = v;
+    tp_neg_inertia = v;
+    return 0;
+}
+
+uint8_t ps2_mouse_tp_neg_inertia_set(uint8_t value) {
+    uint8_t err = ps2_mouse_tp_write(PS2_MOUSE_TP_SUB_NEG_INERTIA, value);
+    if (err) return err;
+    tp_neg_inertia = value;
+    if (debug_mouse) xprintf("ps2_mouse: TP negative inertia set to %d\n", value);
+    return 0;
+}
+
+uint8_t ps2_mouse_tp_neg_inertia_change(int8_t delta) {
+    int new_val = (int)tp_neg_inertia + delta;
+    if (new_val < PS2_MOUSE_TP_NEG_INERTIA_MIN) new_val = PS2_MOUSE_TP_NEG_INERTIA_MIN;
+    if (new_val > PS2_MOUSE_TP_NEG_INERTIA_MAX) new_val = PS2_MOUSE_TP_NEG_INERTIA_MAX;
+    return ps2_mouse_tp_neg_inertia_set((uint8_t)new_val);
+}
+
+uint8_t ps2_mouse_tp_value6_upper_plateau_speed_get(uint8_t *value) {
+    uint8_t err;
+    uint8_t v = ps2_mouse_tp_read(PS2_MOUSE_TP_SUB_VALUE6_UPPER_PLATEAU_SPEED, &err);
+    if (err) return err;
+    *value = v;
+    tp_value6 = v;
+    return 0;
+}
+
+uint8_t ps2_mouse_tp_value6_upper_plateau_speed_set(uint8_t value) {
+    uint8_t err = ps2_mouse_tp_write(PS2_MOUSE_TP_SUB_VALUE6_UPPER_PLATEAU_SPEED, value);
+    if (err) return err;
+    tp_value6 = value;
+    if (debug_mouse) xprintf("ps2_mouse: TP value6 upper plateau speed set to %d\n", value);
+    return 0;
+}
+
+uint8_t ps2_mouse_tp_value6_upper_plateau_speed_change(int8_t delta) {
+    int new_val = (int)tp_value6 + delta;
+    if (new_val < PS2_MOUSE_TP_VALUE6_UPPER_PLATEAU_SPEED_MIN) new_val = PS2_MOUSE_TP_VALUE6_UPPER_PLATEAU_SPEED_MIN;
+    if (new_val > PS2_MOUSE_TP_VALUE6_UPPER_PLATEAU_SPEED_MAX) new_val = PS2_MOUSE_TP_VALUE6_UPPER_PLATEAU_SPEED_MAX;
+    return ps2_mouse_tp_value6_upper_plateau_speed_set((uint8_t)new_val);
+}
+
+uint8_t ps2_mouse_tp_pts_threshold_get(uint8_t *value) {
+    uint8_t err;
+    uint8_t v = ps2_mouse_tp_read(PS2_MOUSE_TP_SUB_PTS_THRESHOLD, &err);
+    if (err) return err;
+    *value = v;
+    tp_pts_threshold = v;
+    return 0;
+}
+
+uint8_t ps2_mouse_tp_pts_threshold_set(uint8_t value) {
+    uint8_t err = ps2_mouse_tp_write(PS2_MOUSE_TP_SUB_PTS_THRESHOLD, value);
+    if (err) return err;
+    tp_pts_threshold = value;
+    if (debug_mouse) xprintf("ps2_mouse: TP press-to-select threshold set to %d\n", value);
+    return 0;
+}
+
+uint8_t ps2_mouse_tp_pts_threshold_change(int8_t delta) {
+    int new_val = (int)tp_pts_threshold + delta;
+    if (new_val < PS2_MOUSE_TP_PTS_THRESHOLD_MIN) new_val = PS2_MOUSE_TP_PTS_THRESHOLD_MIN;
+    if (new_val > PS2_MOUSE_TP_PTS_THRESHOLD_MAX) new_val = PS2_MOUSE_TP_PTS_THRESHOLD_MAX;
+    return ps2_mouse_tp_pts_threshold_set((uint8_t)new_val);
+}
+
+void ps2_mouse_tp_settings_reset(void) {
+    ps2_mouse_tp_sensitivity_set(PS2_MOUSE_TP_SENSITIVITY_DEFAULT);
+    ps2_mouse_tp_neg_inertia_set(PS2_MOUSE_TP_NEG_INERTIA_DEFAULT);
+    ps2_mouse_tp_value6_upper_plateau_speed_set(PS2_MOUSE_TP_VALUE6_UPPER_PLATEAU_SPEED_DEFAULT);
+    ps2_mouse_tp_pts_threshold_set(PS2_MOUSE_TP_PTS_THRESHOLD_DEFAULT);
+}
+
 int16_t apply_smooth_curve(int16_t input) {
     int sign = (input > 0) ? 1 : -1;
     int16_t abs_input = abs(input);

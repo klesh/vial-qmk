@@ -354,3 +354,73 @@ a layer.  To use, define the following function in your keymap:
 ```c
 void ps2_mouse_moved_user(report_mouse_t *mouse_report);
 ```
+
+### TrackPoint Runtime Adjustment {#trackpoint-runtime-adjustment}
+
+TrackPoints expose several adjustable parameters through the extended
+`0xE2` PS/2 command prefix (see the *IBM TrackPoint System Version 4.0
+Engineering Specification*). The driver provides helper functions so that a
+keymap can change these at run time, e.g. by binding custom keycodes to them in
+`process_record_user`.
+
+The available settings are:
+
+| Setting | Range | Default | Description |
+|---------|-------|---------|-------------|
+| sensitivity | 0-255 | 128 | Overall sensitivity (0x80 ≈ 1.0x) |
+| negative inertia | 0-255 | 6 | Counteracts the inertia that makes the cursor keep moving |
+| value6 upper plateau speed | 0-255 | 0x61 | Upper plateau speed of the transfer function |
+| press-to-select threshold | 0-255 | 0x08 | Pressure threshold for press-to-select |
+
+The functions are:
+
+```c
+uint8_t ps2_mouse_tp_sensitivity_get(uint8_t *value);
+uint8_t ps2_mouse_tp_sensitivity_set(uint8_t value);
+uint8_t ps2_mouse_tp_sensitivity_change(int8_t delta);
+
+uint8_t ps2_mouse_tp_neg_inertia_get(uint8_t *value);
+uint8_t ps2_mouse_tp_neg_inertia_set(uint8_t value);
+uint8_t ps2_mouse_tp_neg_inertia_change(int8_t delta);
+
+uint8_t ps2_mouse_tp_value6_upper_plateau_speed_get(uint8_t *value);
+uint8_t ps2_mouse_tp_value6_upper_plateau_speed_set(uint8_t value);
+uint8_t ps2_mouse_tp_value6_upper_plateau_speed_change(int8_t delta);
+
+uint8_t ps2_mouse_tp_pts_threshold_get(uint8_t *value);
+uint8_t ps2_mouse_tp_pts_threshold_set(uint8_t value);
+uint8_t ps2_mouse_tp_pts_threshold_change(int8_t delta);
+
+void ps2_mouse_tp_settings_reset(void);
+```
+
+Example keymap snippet that defines custom keycodes for adjusting the
+sensitivity in steps of 10:
+
+```c
+enum custom_keycodes {
+    TP_SENS_UP = SAFE_RANGE,
+    TP_SENS_DOWN,
+    TP_RESET,
+};
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    if (record->event.pressed) {
+        switch (keycode) {
+            case TP_SENS_UP:
+                ps2_mouse_tp_sensitivity_change(10);
+                return false;
+            case TP_SENS_DOWN:
+                ps2_mouse_tp_sensitivity_change(-10);
+                return false;
+            case TP_RESET:
+                ps2_mouse_tp_settings_reset();
+                return false;
+        }
+    }
+    return true;
+}
+```
+
+All functions return `0` on success or a non-zero error code when the device
+is not a TrackPoint or the command timed out.

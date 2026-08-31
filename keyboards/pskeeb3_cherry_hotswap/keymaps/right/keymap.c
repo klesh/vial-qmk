@@ -3,6 +3,7 @@
 
 #include QMK_KEYBOARD_H
 #include "quantum/qmk_settings.h"
+#include "ps2_mouse.h"
 
 // Defines names for use in layer keycodes and the keymap
 enum layer_names {
@@ -12,12 +13,17 @@ enum layer_names {
     _SC
 };
 
+enum custom_keycodes {
+    TP_SENS_DOWN = SAFE_RANGE,
+    TP_SENS_UP,
+};
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_QW] = LAYOUT_split_3x5_4(
   KC_Q,         KC_W,         KC_E,         KC_R,         KC_T,              KC_Y,    KC_U,         KC_I,         KC_O,         KC_P,
   LALT_T(KC_A), LSFT_T(KC_S), LGUI_T(KC_D), LCTL_T(KC_F), LT(_SC, KC_G),     LT(_SC, KC_H),    RCTL_T(KC_J), RGUI_T(KC_K), RSFT_T(KC_L), RALT_T(KC_SCLN),
   LCTL_T(KC_Z), KC_X,         KC_C,         KC_V,         KC_B,              KC_N,    KC_M,         KC_COMM,      KC_DOT,       LCTL_T(KC_SLSH),
-                  KC_SLEP, LT(_LO, KC_ENT), LT(_SC, KC_ESC), KC_BTN2,      KC_BTN1, LT(_RA, KC_BSPC), RSFT_T(KC_SPC),  KC_MPLY
+                  KC_SLEP, LT(_LO, KC_ENT), LT(_SC, KC_ESC), KC_BTN1,      KC_BTN2, LT(_RA, KC_BSPC), RSFT_T(KC_SPC),  KC_MPLY
 ),
 
 
@@ -41,11 +47,25 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_SC] = LAYOUT_split_3x5_4(
   LALT(KC_F4),  _______, KC_END,  _______,       _______,            KC_WBAK, LCTL(KC_PGUP), LCTL(KC_PGDN), KC_WFWD, KC_MPRV,
   KC_HOME,      KC_BSPC, KC_DEL,  LCTL(KC_RGHT), _______,            KC_LEFT, KC_DOWN,       KC_UP,         KC_RGHT, RGB_TOG,
-  KC_WH_L,      KC_WH_R, KC_CAPS, _______,       LCTL(KC_LEFT),      KC_MNXT, _______,       KC_WH_U,       KC_WH_D,  KC_MPLY,
+  TP_SENS_DOWN, TP_SENS_UP, KC_CAPS, _______,       LCTL(KC_LEFT),      KC_MNXT, _______,       KC_WH_U,       KC_WH_D,  KC_MPLY,
                 _______, _______, _______, _______,                  KC_BTN3, KC_BTN2, _______, _______
 ),
 
 };
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    if (record->event.pressed) {
+        switch (keycode) {
+            case TP_SENS_DOWN:
+                ps2_mouse_tp_sensitivity_change(-10);
+                return false;
+            case TP_SENS_UP:
+                ps2_mouse_tp_sensitivity_change(10);
+                return false;
+        }
+    }
+    return true;
+}
 
 #if defined(ENCODER_MAP_ENABLE)
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
@@ -58,6 +78,10 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
 
 
 void keyboard_post_init_user(void) {
+    debug_enable=true;
+    debug_mouse=true;
+    debug_keyboard=true;
+    debug_matrix=true;
     vial_combo_entry_t tab = {
       {KC_E, KC_R, KC_NO, KC_NO},
       KC_TAB,

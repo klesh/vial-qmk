@@ -55,27 +55,6 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
 };
 #endif
 
-<<<<<<< HEAD
-#ifdef OLED_ENABLE
-bool oled_task_user(void) {
-    // Host Keyboard Layer Status
-    oled_write_P(PSTR("Layer: "), false);
-
-    switch (get_highest_layer(layer_state)) {
-        case _QWERTY:
-            oled_write_P(PSTR("Default\n"), false);
-            break;
-        case _FN:
-            oled_write_P(PSTR("FN\n"), false);
-            break;
-        case _ADJ:
-            oled_write_P(PSTR("ADJ\n"), false);
-            break;
-        default:
-            // Or use the write_ln shortcut over adding '\n' to the end of your string
-            oled_write_ln_P(PSTR("Undefined"), false);
-    }
-=======
 
 
 
@@ -96,14 +75,13 @@ bool oled_task_user(void) {
     char layer[3];
     itoa(get_highest_layer(layer_state), layer, 10);
     oled_write_P(layer, false);
->>>>>>> a0b7139b8a (fix: pskeeb2 cherry hotswap working)
 
     // Host Keyboard LED Status
     led_t led_state = host_keyboard_led_state();
     oled_write_P(led_state.num_lock ? PSTR(" NUM") : PSTR("    "), false);
     oled_write_P(led_state.caps_lock ? PSTR(" CAP") : PSTR("    "), false);
     oled_write_P(led_state.scroll_lock ? PSTR(" SCR") : PSTR("    "), false);
-    
+
     // new line
     oled_set_cursor(0, 1);
 

@@ -47,7 +47,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_SC] = LAYOUT_split_3x5_4(
   LALT(KC_F4),  _______, KC_END,  _______,       _______,            KC_WBAK, LCTL(KC_PGUP), LCTL(KC_PGDN), KC_WFWD, KC_MPRV,
   KC_HOME,      KC_BSPC, KC_DEL,  LCTL(KC_RGHT), _______,            KC_LEFT, KC_DOWN,       KC_UP,         KC_RGHT, RGB_TOG,
-  TP_SENS_DOWN, TP_SENS_UP, KC_CAPS, _______,       LCTL(KC_LEFT),      KC_MNXT, _______,       KC_WH_U,       KC_WH_D,  KC_MPLY,
+  TP_SENS_DOWN, TP_SENS_UP, LCTL(KC_C), LCTL(KC_V),       LCTL(KC_LEFT),      KC_MNXT, _______,       KC_WH_U,       KC_WH_D,  KC_MPLY,
                 _______, _______, _______, _______,                  KC_BTN3, KC_BTN2, _______, _______
 ),
 
